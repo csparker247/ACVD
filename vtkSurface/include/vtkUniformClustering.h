@@ -34,6 +34,9 @@
 #define _VTKUNIFORMCLUSTERING_H_
 
 #include <algorithm>
+#include <numeric>
+#include <random>
+
 #include <vtkCommand.h>
 #include <vtkMath.h>
 #include <vtkCellData.h>
@@ -50,7 +53,7 @@ template <class Metric, typename EdgeType=vtkIdType> class vtkUniformClustering:
 public vtkObject
 {
 public:
-	
+
 	/// Sets the number of clusters to create
 	void SetNumberOfClusters(int N)
 	{
@@ -76,43 +79,43 @@ public:
 	/// Main class call: processes the clustering. List is the list of items to cluster. If you want to process
 	/// all the items (which is the case in 99.99% of the cases), leave this parameter empty
 	vtkIntArray *ProcessClustering(vtkIdList *List=0);
-	
+
 	/// Returns the Clustering
 	vtkIntArray *GetClustering();
-	
+
 	// Sets On/Off the fast initialization by unconstrained clustering (default : Off)
 	void SetConstrainedInitialization(int C) {this->UnconstrainedInitializationFlag=C;};
-			
+
 	/// Enables/Disables graphical display
 	/// 0: no display  1: display after convergence   2: display during convergence (might be slow)
 	/// 3: display during clustering and capture images
 	/// default:1
 	void SetDisplay(int d){this->Display=d;};
-	
+
 	/// Sets the Anchor Renderwindow of the class
 	/// this is usefull when several windows have to be linked outside this class
 	void SetAnchorRenderWindow(RenderWindow *Window) {this->AnchorRenderWindow=Window;};
-	
+
 	/// Enables/Disables console output (text mode)  while processing
 	/// 0: off  1:on  Default:0
 	void SetConsoleOutput(int d){this->ConsoleOutput=d;};
-	
+
 	/// Sets the maximun number of convergences while minimizing the energy term
 	/// can speed up things a bit (usually not needed)
 	void SetMaxNumberOfConvergences(int n){this->MaxNumberOfConvergences=n;};
-	
+
 	/// Sets the maximum number of loops during minimzation
 	/// can be usefull when there are always clusters with disconnected components (VERY VERY RARE)
 	void SetMaxNumberOfLoops(int n){this->MaxNumberOfLoops=n;};
-		
+
 	/// Determines how the initial sampling is done
 	/// 0: each cluster gets one randomly picked item
 	/// 1: the clusters are initialized according to the density function
 	void SetInitialSamplingType (int Type) {this->InitialSamplingType=Type;};
 
-	/// Defines an initial clustering 
+	/// Defines an initial clustering
 	void SetInitialClustering(vtkIntArray *Clustering);
-	
+
 	/// Returns the Number of clusters
 	int GetNumberOfClusters() {return this->NumberOfClusters;};
 
@@ -121,10 +124,10 @@ public:
 
 	/// Returns a pointer to a given cluster
 	typename Metric::Cluster *GetCluster(int C) {return (this->Clusters+C);};
-	
+
 	/// Sets On/Off the writing of the energy evolution during the clustering to a file called "energy.txt"
 	void SetWriteToGlobalEnergyLog(int S) {this->ComputeAndSaveEnergy=S;};
-	
+
 	/// Defines the output directory where thr log file will be written
 	void SetOutputDirectory(char *S) {this->OutputDirectory=S;};
 
@@ -169,14 +172,14 @@ protected:
 
 	/// method to create the render window(s)
 	virtual void CreateWindows()=0;
-	
+
 	/// method to enable window interaction
 	virtual void InteractWithClusteringWindow(){};
 
 	/// Method to build the metric (pure virtual function)
 	virtual void BuildMetric()=0;
-	
-	/// Method mostly usefull when clustering volumes with boundaries constraints : 
+
+	/// Method mostly usefull when clustering volumes with boundaries constraints :
 	/// this method returns whether an item is on the boundary between objects
 	/// the method should return -1 when the item is not on a boundary.
 	virtual int GetItemType(vtkIdType Item){return (1);};
@@ -191,24 +194,24 @@ protected:
 	RenderWindow *AnchorRenderWindow;
 
 	/// the constructor
-	vtkUniformClustering(); 
+	vtkUniformClustering();
 
 	/// the destructor
-	~vtkUniformClustering(); 
-	
+	~vtkUniformClustering();
+
 	/// Parameter indicating if the connexity constraint for the clusters has to be respected
 	int ConnexityConstraint;
 
 	/// The Clustrering (one value for each Item)
 	vtkIntArray *Clustering;
-	
+
 	/// Possibly points to a user-defined initial clustering when one was defined by SetInitialClustering()
 	vtkIntArray *InitialClustering;
 
-	/// Parameter to enable Graphical Display of the clustering 
+	/// Parameter to enable Graphical Display of the clustering
 	/// 0: no display  1: display after convergence   2: display during convergence (might be slow)
 	int Display;
-	
+
 	/// initialize the arrays (accumulators etc)
 	virtual void Init();
 
@@ -218,7 +221,7 @@ protected:
 	/// re-computes the statistics of the clustering
 	void ReComputeStatistics();
 
-	/// the maximum number of convergences. 
+	/// the maximum number of convergences.
 	/// When the number max of convergences is reached, the clustering is considered to be finished
 	/// Note: this is only a secutity system to prevent hanging. The clustering heoretically allways finishes
 	int MaxNumberOfConvergences;
@@ -229,7 +232,7 @@ protected:
 
 	/// Parameter to enable Text Output
 	int ConsoleOutput;
-	
+
 	/// Picks the initial samples
 	void InitSamples(vtkIdList *List);
 
@@ -239,7 +242,7 @@ protected:
 	/// Paramter defining th initial sampling type
 	/// 1: random initialisation  2: weight-based initialisation
 	int InitialSamplingType;
-	
+
 	/// the number of wanted clusters
 	int NumberOfClusters;
 
@@ -273,7 +276,7 @@ protected:
 
 	/// this is the method that actually minimizes the energy term by moidifying the clustering
 	virtual void MinimizeEnergy();
-	
+
 	/// this methods performs one minimization loop on the boundary edges;
 	virtual int ProcessOneLoop();
 
@@ -291,8 +294,8 @@ protected:
 
 	/// array containing the last time a cluster was modified (usefull for speed improvement)
 	int *ClustersLastModification;
-	
-	/// clears the optimization context 
+
+	/// clears the optimization context
 	/// (usefull when the boundary edges list was modified externally e.g. after initialization etc...)
 	void SetAllClustersToModified();
 
@@ -336,7 +339,7 @@ protected:
 	// this flag determines whether the clustering will be performed first with unconstrained metric and then with constrained metric (this makes the clustering faster)
 	int UnconstrainedInitializationFlag;
 
-	// a buffer List for the method AddItemRingToProcess 
+	// a buffer List for the method AddItemRingToProcess
 	vtkIdList *EdgeList;
 
 	// an array to define freezed clusters
@@ -408,7 +411,7 @@ void vtkUniformClustering<Metric,EdgeType>::ReComputeStatistics()
 	}
 	for	(vtkIdType i=0;i!=this->NumberOfClusters-this->NumberOfSpareClusters;i++)
 	{
-	
+
 		this->MetricContext.ComputeClusterCentroid(Clusters+i);
 		this->MetricContext.ComputeClusterEnergy(Clusters+i);
 		if (this->ClustersSizes->GetValue(i)==0)
@@ -496,7 +499,7 @@ int	vtkUniformClustering<Metric,EdgeType>::CleanClustering()
 					Clusters[Type]->InsertNextId(i);
 					Clusters[Type]->InsertNextId(Size);
 				}
-			}																  
+			}
 		}
 	}
 
@@ -563,7 +566,7 @@ int	vtkUniformClustering<Metric,EdgeType>::CleanClustering()
 	delete [] VisitedCluster;
 	delete [] Sizes;
 	IList->Delete();
-	
+
 	return (Number);
 }
 
@@ -590,8 +593,8 @@ void vtkUniformClustering<Metric,EdgeType>::FillHolesInClustering(vtkIntArray *C
 		this->GetEdgeItems(i,I1,I2);
 		if ((I2>=0)&&(I1>=0))
 		{
-			Cluster1=Clustering->GetValue(I1);		
-			Cluster2=Clustering->GetValue(I2);	
+			Cluster1=Clustering->GetValue(I1);
+			Cluster2=Clustering->GetValue(I2);
 			if ((Cluster1<0)||(Cluster1>=this->NumberOfClusters))
 			{
 				if ((Cluster2>=0)&&(Cluster2<this->NumberOfClusters))
@@ -625,7 +628,7 @@ void vtkUniformClustering<Metric,EdgeType>::FillHolesInClustering(vtkIntArray *C
 				Cluster1=Cluster2;
 				Cluster2=this->NumberOfClusters;
 			}
-			
+
 			if ((Cluster1!=this->NumberOfClusters)&&(Cluster2==this->NumberOfClusters)
 					&&(this->ConnexityConstraintProblem(I2,Edge,Cluster2,Cluster1)==0))
 			{
@@ -650,7 +653,7 @@ void vtkUniformClustering<Metric,EdgeType>::FillHolesInClustering(vtkIntArray *C
 		if ((Cluster1<0)||(Cluster1>=this->NumberOfClusters))
 			NumberOfProblems++;
 	}
-	
+
 	if ((this->ConsoleOutput>0)&&(NumberOfProblems>0))
 		cout<<endl<<"WARNING : The number	of uncorrectly assigned	Items was reduced from "<<
 		InitialNumberOfProblems<<" to "<<NumberOfProblems<<" Problems"<<endl;
@@ -691,7 +694,7 @@ vtkIntArray* vtkUniformClustering<Metric,EdgeType>::ProcessClustering(vtkIdList 
 
 	this->Init();
 	this->InitSamples(List);
-	
+
 	char FileName[1000];
 	if (this->OutputDirectory)
 	{
@@ -700,8 +703,8 @@ vtkIntArray* vtkUniformClustering<Metric,EdgeType>::ProcessClustering(vtkIdList 
 	}
 	else
 		strcpy(FileName,"energy.txt");
-		
-	
+
+
 	if (this->ComputeAndSaveEnergy)
 		this->GlobalEnergyLog.open (FileName, ofstream::out | ofstream::trunc);
 
@@ -716,17 +719,17 @@ vtkIntArray* vtkUniformClustering<Metric,EdgeType>::ProcessClustering(vtkIdList 
 			cout<<"Performing unconstrained initialization"<<endl;
 		this->MetricContext.SetConstrainedClustering(0);
 	}
-	
+
 	this->StartTime=Timer->GetUniversalTime();
 	Timer->StartTimer();
 	this->NumberOfConvergences=0;
 	this->MinimizeEnergy();
 	Timer->StopTimer();
-	
+
 	if (this->ComputeAndSaveEnergy)
 	{
 		this->ReComputeStatistics();
-		GlobalEnergyLog<<"Final Energy :"<<setprecision(15)<<this->ComputeGlobalEnergy()<<endl;		
+		GlobalEnergyLog<<"Final Energy :"<<setprecision(15)<<this->ComputeGlobalEnergy()<<endl;
 		this->GlobalEnergyLog.close();
 	}
 
@@ -759,7 +762,7 @@ void vtkUniformClustering<Metric,EdgeType>::MinimizeEnergy()
 	this->ReComputeStatistics();
 	this->SetAllClustersToModified();
 	vtkTimerLog *Timer=vtkTimerLog::New();
-	
+
 	while (1)
 	{
 		Timer->StartTimer();
@@ -773,13 +776,13 @@ void vtkUniformClustering<Metric,EdgeType>::MinimizeEnergy()
 
 		// Write Energy value and computing times to file if wanted
 		this->WriteToGlobalEnergyLog();
-		
+
 		if (this->ConsoleOutput>1)
 		{
 			cout<<(char) 13;
 			if (this->ConnexityConstraint==1)
 				cout<<"*";
-					
+
 			cout<<"Loop "<<this->NumberOfLoops<<", duration : "<<(int) Timer->GetElapsedTime()
 				<<" s., "<<NumberOfModifications<<" Modifications            "<<std::flush;
 		}
@@ -793,7 +796,7 @@ void vtkUniformClustering<Metric,EdgeType>::MinimizeEnergy()
 		}
 		else
 			this->RelativeNumberOfLoops++;
-		
+
 		if ((NumberOfModifications==0)
 			||(this->NumberOfLoops>this->MaxNumberOfLoops)
 			||((NumberOfModifications<this->GetNumberOfItems()/1000)&&(NumberOfConvergences==0)))
@@ -808,7 +811,7 @@ void vtkUniformClustering<Metric,EdgeType>::MinimizeEnergy()
 				if ((NumberOfModifications)&&(this->ConsoleOutput))
 					cout<<endl<<"Trigerring early convergence for speed increase";
 			}
-			this->ConnexityConstraint=1;		
+			this->ConnexityConstraint=1;
 			NumberOfConvergences++;
 
 			NumberOfDisconnectedClusters=this->CleanClustering();
@@ -827,18 +830,18 @@ void vtkUniformClustering<Metric,EdgeType>::MinimizeEnergy()
 					cout<<"Maximum allowed number of loops reached, exiting minimization"<<endl;
 				break;
 			}
-			
+
 			if(NumberOfConvergences>=MaxNumberOfConvergences)
 			{
 				if (this->ConsoleOutput)
 					cout<<"Maximum allowed number of convergences reached, exiting minimization"<<endl;
 				break;
 			}
-			
-			this->ReComputeStatistics();			
+
+			this->ReComputeStatistics();
 			this->FillQueuesFromClustering();
 			this->SetAllClustersToModified();
-		}	
+		}
 	}
 	Timer->Delete();
 }
@@ -867,16 +870,16 @@ int vtkUniformClustering<Metric,EdgeType>::ProcessOneLoop()
 
 	int NumberOfModifications=0;
 	while (1)
-	{		
+	{
 		Edge=this->EdgeQueue.front();
 		this->EdgeQueue.pop();
-		
+
 		if (Edge==-1)
 			break;
 
 		this->GetEdgeItems(Edge,I1,I2);
 
-		// Check if	this edge was not already visited. 
+		// Check if	this edge was not already visited.
 		if ((this->EdgesLastLoop[Edge]!=this->RelativeNumberOfLoops)&&(I2>=0))
 		{
 			this->EdgesLastLoop[Edge]=this->RelativeNumberOfLoops;
@@ -1186,7 +1189,7 @@ void vtkUniformClustering<Metric,EdgeType>::InitSamples(vtkIdList *List)
 			{
 				if (List)
 					test=CRan->Random(0.0,(float) List->GetNumberOfIds()-1);
-				else 
+				else
 					test=CRan->Random(0.0,(float)this->GetNumberOfItems());
 
 				number=(int)floor(test+0.5);
@@ -1195,7 +1198,7 @@ void vtkUniformClustering<Metric,EdgeType>::InitSamples(vtkIdList *List)
 					number = i;
 				}
 				if (List)
-					number=List->GetId(number);			
+					number=List->GetId(number);
 				if (this->Clustering->GetValue(number)==NumberOfClusters)
 				{
 					ok=1;
@@ -1217,10 +1220,14 @@ void vtkUniformClustering<Metric,EdgeType>::InitSamples(vtkIdList *List)
 template <class Metric, class EdgeType>
 void vtkUniformClustering<Metric,EdgeType>::ComputeInitialRandomSampling(vtkIdList *List,vtkIntArray	*Sampling,int NumberOfRegions)
 {
+    static std::random_device rngdev;
+    static std::mt19937 urng(rngdev());
+
 	for	(int i=0;i<this->GetNumberOfItems();i++)
 		Sampling->SetValue(i,this->NumberOfClusters);
 
-	int	*Items=new int[this->GetNumberOfItems()];
+	std::vector<int> Items(this->GetNumberOfItems());
+	std::iota(std::begin(Items), std::end(Items), 0);
 	int	NumberOfRemainingItems=this->GetNumberOfItems();
 	int	NumberOfRemainingRegions=NumberOfRegions;
 	bool Found;
@@ -1228,9 +1235,7 @@ void vtkUniformClustering<Metric,EdgeType>::ComputeInitialRandomSampling(vtkIdLi
 	std::queue<int>	IQueue;
 
 	// shuffle the Ids ordering
-	for	(int i=0;i<NumberOfRemainingItems;i++)
-		Items[i]=i;
-	std::random_shuffle(Items, Items+NumberOfRemainingItems);
+    std::shuffle(std::begin(Items), std::next(std::begin(Items), NumberOfRemainingItems), urng);
 
 	// compute total weight
 	double SWeights=0;
@@ -1284,7 +1289,7 @@ void vtkUniformClustering<Metric,EdgeType>::ComputeInitialRandomSampling(vtkIdLi
 
 	if (NumberOfRemainingRegions==0)
 	{
-		delete [] Items;
+		Items.clear();
 		IList->Delete();
 		return;
 	}
@@ -1302,7 +1307,7 @@ void vtkUniformClustering<Metric,EdgeType>::ComputeInitialRandomSampling(vtkIdLi
 		Items[i]=i;
 	}
 
-	std::random_shuffle(Items, Items+NumberOfItems);
+    std::shuffle(std::begin(Items), std::next(std::begin(Items), NumberOfItems), urng);
 	FirstItem=0;
 	while(NumberOfRemainingRegions>0)
 	{
@@ -1340,10 +1345,10 @@ long double vtkUniformClustering<Metric,EdgeType>::ComputeGlobalEnergy()
 	int Bin=0;
 	int BinCount=0;
 	long double *Bins=new long double [NumberOfBins];
-	
+
 	for (i=0;i<NumberOfBins;i++)
 		Bins[i]=0;
-		
+
 	for (i=0;i<this->NumberOfClusters;i++)
 	{
 		Bins[Bin]+=(long double) this->MetricContext.GetClusterEnergy(this->Clusters+i);
@@ -1354,7 +1359,7 @@ long double vtkUniformClustering<Metric,EdgeType>::ComputeGlobalEnergy()
 				Bin++;
 		}
 	}
-	
+
 	for (i=0;i<NumberOfBins;i++)
 		Energy+=Bins[i];
 
