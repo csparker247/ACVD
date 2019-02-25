@@ -39,227 +39,259 @@
 /**
  * An efficient class for 3D triangular mesh display.
  * It can display vtkPolyData and vtkSurface
- * 
+ *
  *  Custom interactions:
- *  - "0"			Save input mesh to "mesh.ply"
- *  - "9"			Save input mesh to "mesh.stl"
- *  - "8"			Save input mesh to "mesh.obj"
- *  - "7"			Save input mesh to "mesh.vtk"
- *  - "6"			Load camera viewport from file
- *  - "5"			Save camera viewport to file
+ *  - "0"            Save input mesh to "mesh.ply"
+ *  - "9"            Save input mesh to "mesh.stl"
+ *  - "8"            Save input mesh to "mesh.obj"
+ *  - "7"            Save input mesh to "mesh.vtk"
+ *  - "6"            Load camera viewport from file
+ *  - "5"            Save camera viewport to file
  *
- *  - "1"			Capture window to "capure.jpg" image file
- *  - "2"			Capture window to "capture.eps" image file
- *  - "3"			Capture window to "capture.png" image file
- *  - "4"			Set the window size multiplication factor (>=1) to create high quality capture images	
- *  - "A"			Set the Anti-aliasing factor (>=1)
+ *  - "1"            Capture window to "capure.jpg" image file
+ *  - "2"            Capture window to "capture.eps" image file
+ *  - "3"            Capture window to "capture.png" image file
+ *  - "4"            Set the window size multiplication factor (>=1) to create
+ * high quality capture images
+ *  - "A"            Set the Anti-aliasing factor (>=1)
  *
- *  - "E"			Set the number of times Interact() will be skipped (usefull for debuging)
- *  - "x"			Toggles On/off the display of the mesh edges on the surface
- *  - "n"			Enable Normal Mapping (displays smooth meshes)
- *  - "i"			Toggles On/Off the display of vertices and cells Ids in a subwindow
- *  - "a"			Forces Rendering
- *  - "+"			Increases the width of rendered edges
- *  - "-"			Decreases the width of rendered edges
+ *  - "E"            Set the number of times Interact() will be skipped (usefull
+ * for debuging)
+ *  - "x"            Toggles On/off the display of the mesh edges on the surface
+ *  - "n"            Enable Normal Mapping (displays smooth meshes)
+ *  - "i"            Toggles On/Off the display of vertices and cells Ids in a
+ * subwindow
+ *  - "a"            Forces Rendering
+ *  - "+"            Increases the width of rendered edges
+ *  - "-"            Decreases the width of rendered edges
  */
 
 class  VTK_EXPORT RenderWindow
 {
 public:
+    // The constructor, vtk style (although RenderWindow is not a vtkObject
+    // anymore...)
+    static RenderWindow* New();
+    void Delete() { delete this; };
 
-	// The constructor, vtk style (although RenderWindow is not a vtkObject anymore...)
-	static RenderWindow *New();
-	void Delete() {delete this;};
+    // Adds some text in the window,
+    // The x,y and z coordinates are world coordinates, so the text will move
+    // with the object R, G and B are the colors components Size is the text
+    // Size
+    void AddText(
+        char* text,
+        float x,
+        float y,
+        float z,
+        float R,
+        float G,
+        float B,
+        int Size,
+        int Justification = 1);
 
-	// Adds some text in the window,
-	// The x,y and z coordinates are world coordinates, so the text will move with the object
-	// R, G and B are the colors components
-	// Size is the text Size
-	void AddText(char *text,float x, float y, float z, float R, float G, float B, int Size, int Justification=1);
-	
-	// write 2D text on the screen;
-	void SetText (const char *text);
+    // write 2D text on the screen;
+    void SetText(const char* text);
 
-	/// captures the Window to a file
-	/// supported file formats are: BMP, EPS, PNG (automatic file format detection)
-	void Capture(const char *filename);
+    /// captures the Window to a file
+    /// supported file formats are: BMP, EPS, PNG (automatic file format
+    /// detection)
+    void Capture(const char* filename);
 
-	/// Sets the magnification factor for the capture (the dimensions of the image will be multiplied by Factor)
-	void SetCaptureMagnificationFactor (int Factor){this->CaptureMagnificationFactor=Factor;};
+    /// Sets the magnification factor for the capture (the dimensions of the
+    /// image will be multiplied by Factor)
+    void SetCaptureMagnificationFactor(int Factor)
+    {
+        this->CaptureMagnificationFactor = Factor;
+    };
 
-	/// Links the window viewport to an other RenderWindow
-	void AttachToRenderWindow(RenderWindow *Window)
-	{
-		if (Window)
-		{
-			this->GetMeshRenderer()->SetActiveCamera(Window->GetMeshRenderer()->GetActiveCamera());
-		}
-	}
+    /// Links the window viewport to an other RenderWindow
+    void AttachToRenderWindow(RenderWindow* Window)
+    {
+        if (Window) {
+            this->GetMeshRenderer()->SetActiveCamera(
+                Window->GetMeshRenderer()->GetActiveCamera());
+        }
+    }
 
-	/// returns the vtkCamera of the Window (usefull to change the view : rotations, zoom etc)
-	vtkCamera *GetCamera() {return this->GetMeshRenderer()->GetActiveCamera();}
+    /// returns the vtkCamera of the Window (usefull to change the view :
+    /// rotations, zoom etc)
+    vtkCamera* GetCamera()
+    {
+        return this->GetMeshRenderer()->GetActiveCamera();
+    }
 
-	/// Saves the current camera view to file (only the camera, not the object)
-	void SaveCamera(const char *filename);
-	
-	/// Loads the camera view from file
-	int LoadCamera(const char *filename);
+    /// Saves the current camera view to file (only the camera, not the object)
+    void SaveCamera(const char* filename);
 
-	/// Returns the Renderer used in the window
-	vtkRenderer *GetMeshRenderer()
-	{
-		vtkRendererCollection *Renderers=this->renWin->GetRenderers();
-		Renderers->InitTraversal();
-		return (Renderers->GetNextItem());
-	}
+    /// Loads the camera view from file
+    int LoadCamera(const char* filename);
 
-	/// sets the size of the window in pixels
-	void SetSize (int x, int y) {this->renWin->SetSize( x,y );};
+    /// Returns the Renderer used in the window
+    vtkRenderer* GetMeshRenderer()
+    {
+        vtkRendererCollection* Renderers = this->renWin->GetRenderers();
+        Renderers->InitTraversal();
+        return (Renderers->GetNextItem());
+    }
 
-	/// sets antialiasing (the higher the more antialiased and the slower)
-	void SetAntiAliasing (int n) {
+    /// sets the size of the window in pixels
+    void SetSize(int x, int y) { this->renWin->SetSize(x, y); };
+
+    /// sets antialiasing (the higher the more antialiased and the slower)
+    void SetAntiAliasing(int n)
+    {
 #if VTK_MAJOR_VERSION <= 7
           this->renWin->SetAAFrames(n);
 #else
           std::cerr <<"SetAAFrames is deprecated in VTK-8+";
 #endif
-};
+    };
 
-	/// renders the scene
-	void Render() {this->renWin->Render();};
+    /// renders the scene
+    void Render() { this->renWin->Render(); };
 
-	/// to add a PolyData to the scene
-	vtkActor* AddPolyData(vtkPolyData *Input);
+    /// to add a PolyData to the scene
+    vtkActor* AddPolyData(vtkPolyData* Input);
 
-	/// Starts interactive rendering (viewport control with the mouse)
-	void Interact();
-	
-	/// Set the number of times a call to RenderWindow::Interact() will be skipped
-	void SkipInteractions (int NumberOfInteractionsToSkip)
-	{ this->NumberOfInteractionsToSkip=NumberOfInteractionsToSkip;};
+    /// Starts interactive rendering (viewport control with the mouse)
+    void Interact();
 
-	/// Sets the name of the window
-	void SetWindowName(const char *Name){this->renWin->SetWindowName(Name);};
-	
-	/// Sets the input PolyData
-	vtkActor* SetInputData(vtkPolyData *Input);
+    /// Set the number of times a call to RenderWindow::Interact() will be
+    /// skipped
+    void SkipInteractions(int NumberOfInteractionsToSkip)
+    {
+        this->NumberOfInteractionsToSkip = NumberOfInteractionsToSkip;
+    };
 
-	/// Sets the input VtkSurface
-	vtkActor* SetInputData(vtkSurface *Input);
+    /// Sets the name of the window
+    void SetWindowName(const char* Name) { this->renWin->SetWindowName(Name); };
 
-	/// Returns the input mesh (Warning: its is returned as a vtkPolyData but it may be a vtkSurface!)
-	vtkPolyData *GetInput()
-	{
-		if (this->SInput)
-			return (this->SInput);
-		else
-			return (this->Input);
-	}
+    /// Sets the input PolyData
+    vtkActor* SetInputData(vtkPolyData* Input);
 
-	/// Displays the Ids of the vertices and cells into a sub-window
-	void SetDisplayIdsOn();
-	
-	/// stops displaying the Ids of the vertices and cells
-	void SetDisplayIdsOff();
-	
-	/// switch between Off/On modes for Ids display
-	void SwitchDisplayIds();
+    /// Sets the input VtkSurface
+    vtkActor* SetInputData(vtkSurface* Input);
 
-	/// Displays the mesh with the edges. Does not keep track of connectivity modification,
-	/// so whenever the input mesh connectivity is modified, this method has to be called again
-	void DisplayInputEdges();
+    /// Returns the input mesh (Warning: its is returned as a vtkPolyData but it
+    /// may be a vtkSurface!)
+    vtkPolyData* GetInput()
+    {
+        if (this->SInput)
+            return (this->SInput);
+        else
+            return (this->Input);
+    }
 
-	/// Adds a set of custom edges to the window
-	void SetInputEdges(vtkPolyData *Edges);
-	
-	// Enables Normal Mapping (to display smooth meshes)
-	void EnableNormalMap();
-	
-	/// Returns the vtkIntArray defining which edges are visible
-	vtkIntArray* GetEdgesVisibilityArray();
+    /// Displays the Ids of the vertices and cells into a sub-window
+    void SetDisplayIdsOn();
 
-	/// replace the default LookUpTable by a custom one
-	void SetLookupTable(vtkLookupTable *Colors=0);
-	
-	/// returns the used vtkLoopupTable for coloring
-	vtkLookupTable *GetLookupTable() {return (this->lut);};
+    /// stops displaying the Ids of the vertices and cells
+    void SetDisplayIdsOff();
 
-	/// Displays the colors of the vertices given the Scalars array, with random coloring
-	void DisplayVerticesColors(vtkIntArray *Scalars);
+    /// switch between Off/On modes for Ids display
+    void SwitchDisplayIds();
 
-	/// Displays the colors of the cells given the Scalars array, with random coloring
-	void DisplayCellsColors(vtkIntArray *Scalars);
+    /// Displays the mesh with the edges. Does not keep track of connectivity
+    /// modification, so whenever the input mesh connectivity is modified, this
+    /// method has to be called again
+    void DisplayInputEdges();
 
-	/// Creates random colors for rendering
-	void DisplayRandomColors(int NumberOfColors);
+    /// Adds a set of custom edges to the window
+    void SetInputEdges(vtkPolyData* Edges);
 
-	/// Puts spheres on each Vertex present on the list (Radius is the radius of the sphere)
-	void HighLightVertices(vtkIdList *Vertices, double Radius);
+    // Enables Normal Mapping (to display smooth meshes)
+    void EnableNormalMap();
 
-	/// Puts tubes on each edge present on the list (Radius is the radius of the tube)
-	void HighLightEdges(vtkIdList *Edges, double Radius);
+    /// Returns the vtkIntArray defining which edges are visible
+    vtkIntArray* GetEdgesVisibilityArray();
 
-	/// Puts spheres on each non-manifold vertex (Radius is the radius of the sphere)
+    /// replace the default LookUpTable by a custom one
+    void SetLookupTable(vtkLookupTable* Colors = 0);
+
+    /// returns the used vtkLoopupTable for coloring
+    vtkLookupTable* GetLookupTable() { return (this->lut); };
+
+    /// Displays the colors of the vertices given the Scalars array, with random
+    /// coloring
+    void DisplayVerticesColors(vtkIntArray* Scalars);
+
+    /// Displays the colors of the cells given the Scalars array, with random
+    /// coloring
+    void DisplayCellsColors(vtkIntArray* Scalars);
+
+    /// Creates random colors for rendering
+    void DisplayRandomColors(int NumberOfColors);
+
+    /// Puts spheres on each Vertex present on the list (Radius is the radius of
+    /// the sphere)
+    void HighLightVertices(vtkIdList* Vertices, double Radius);
+
+    /// Puts tubes on each edge present on the list (Radius is the radius of the
+    /// tube)
+    void HighLightEdges(vtkIdList* Edges, double Radius);
+
+    /// Puts spheres on each non-manifold vertex (Radius is the radius of the
+    /// sphere)
     void DisplayNonManifoldVertices(double Radius);
 
-	/// returns the Actor containing the mesh edges
-	vtkActor *GetEdgesActor() {return (this->EdgesActor);};
-	
-	vtkActor *GetMeshActor() {return (this->MeshActor);};
+    /// returns the Actor containing the mesh edges
+    vtkActor* GetEdgesActor() { return (this->EdgesActor); };
 
-	/// returns the underlying vtkRenderWindow
-	vtkRenderWindow *GetvtkRenderWindow() {return (this->renWin);};
-	
-	/// Switches the orientation of the input mesh	
-	void SwitchOrientation();
-	
-	// method to set the interactor style to allow additionnal function keys
-	virtual void SetCustomInteractorStyle();
+    vtkActor* GetMeshActor() { return (this->MeshActor); };
 
-	// sets/unsets immediate mode (default : on)
-	void SetImmediateMode(bool Used);
+    /// returns the underlying vtkRenderWindow
+    vtkRenderWindow* GetvtkRenderWindow() { return (this->renWin); };
+
+    /// Switches the orientation of the input mesh
+    void SwitchOrientation();
+
+    // method to set the interactor style to allow additionnal function keys
+    virtual void SetCustomInteractorStyle();
+
+    // sets/unsets immediate mode (default : on)
+    void SetImmediateMode(bool Used);
 
 protected:
+    // The window
+    vtkRenderWindow* renWin;
 
-	// The window
-	vtkRenderWindow *renWin;
+    // The parameter defining how many times Interaction will be skiped (usually
+    // 0)
+    int NumberOfInteractionsToSkip;
 
-	// The parameter defining how many times Interaction will be skiped (usually 0)	
-	int NumberOfInteractionsToSkip;
+    // The actor for the mesh
+    vtkActor* MeshActor;
 
-	// The actor for the mesh
-	vtkActor *MeshActor;
-	
-	// The Actor for the input edges
-	vtkActor *EdgesActor;
+    // The Actor for the input edges
+    vtkActor* EdgesActor;
 
     vtkActor *HighlightedVerticesActor;
     vtkActor *HighlightedEdgesActor;
-	
-	// The input mesh (when it is a vtkPolyData)
-	vtkPolyData *Input;
 
-	// The input mesh (when it is a vtkSurface)
-	vtkSurface *SInput;
-	
-	// The lookup table used to store colors
-	vtkLookupTable *lut;
+    // The input mesh (when it is a vtkPolyData)
+    vtkPolyData* Input;
 
-	// the window dimensions will be multiplied by this value when saving a snapshot
-	int CaptureMagnificationFactor;
+    // The input mesh (when it is a vtkSurface)
+    vtkSurface* SInput;
 
-	// 2D actors used to display the IDs on screen.
-	vtkActor2D *rectActor;
-	vtkActor2D *pointLabels;
-	vtkActor2D *cellLabels;
+    // The lookup table used to store colors
+    vtkLookupTable* lut;
 
-	vtkTextActor *TextActor;
+    // the window dimensions will be multiplied by this value when saving a
+    // snapshot
+    int CaptureMagnificationFactor;
 
-	bool ImmediateMode;
+    // 2D actors used to display the IDs on screen.
+    vtkActor2D* rectActor;
+    vtkActor2D* pointLabels;
+    vtkActor2D* cellLabels;
 
-	RenderWindow(); 
-	virtual ~RenderWindow();
+    vtkTextActor* TextActor;
 
+    bool ImmediateMode;
+
+    RenderWindow();
+    virtual ~RenderWindow();
 };
 
 #endif

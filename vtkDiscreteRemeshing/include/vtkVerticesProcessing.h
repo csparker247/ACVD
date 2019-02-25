@@ -43,197 +43,194 @@ template <class Processing> class  vtkVerticesProcessing : public Processing
 
 {
 public:
+    static vtkVerticesProcessing* New()
+    {
+        vtkObject* ret =
+            vtkObjectFactory::CreateInstance("vtkVerticesProcessing");
+        if (ret) {
+            return (vtkVerticesProcessing*)ret;
+        }
+        // If the factory was unable to create the object, then create it here.
+        return (new vtkVerticesProcessing<Processing>);
+    };
 
-	static vtkVerticesProcessing *New()
-	{
-		vtkObject* ret = vtkObjectFactory::CreateInstance("vtkVerticesProcessing");
-		if(ret)
-	    {
-			return (vtkVerticesProcessing*)ret;
-	    }
-	  // If the factory was unable to create the object, then create it here.
-		return (new vtkVerticesProcessing<Processing>);
-	};
-
-	int GetNumberOfItems ()
-	{
-		return (this->GetInput()->GetNumberOfPoints());
-	};
+    int GetNumberOfItems() { return (this->GetInput()->GetNumberOfPoints()); };
 
 protected:
-
-	vtkVerticesProcessing() 
-	{
-		this->ClusteringType=1;
-		this->VList=vtkIdList::New();
+    vtkVerticesProcessing()
+    {
+        this->ClusteringType = 1;
+        this->VList = vtkIdList::New();
 #ifdef DOmultithread
-		this->VLists=0;
+        this->VLists = 0;
 #endif
-	};
+    };
 
-	~vtkVerticesProcessing()
-	{
-		this->VList->Delete();
+    ~vtkVerticesProcessing()
+    {
+        this->VList->Delete();
 #ifdef DOmultithread
-		if (VLists!=0)
-		{
-			for (int i=0;i<this->NumberOfThreads+1;i++)
-				VLists[i]->Delete();
-			delete [] VQueues;
-			delete [] VLists;
-		}
+        if (VLists != 0) {
+            for (int i = 0; i < this->NumberOfThreads + 1; i++)
+                VLists[i]->Delete();
+            delete[] VQueues;
+            delete[] VLists;
+        }
 #endif
-	};
+    };
 
-	void GetItemCoordinates(vtkIdType Item, double *P)
-	{
-		this->GetInput()->GetPointCoordinates(Item,P);
-	}
-	
-	double GetItemArea(vtkIdType Item)
-	{
-		return (this->GetInput()->GetVertexArea(Item));
-	}
+    void GetItemCoordinates(vtkIdType Item, double* P)
+    {
+        this->GetInput()->GetPointCoordinates(Item, P);
+    }
 
-	int GetNumberOfDualItems(){return (this->Input->GetNumberOfCells());};
+    double GetItemArea(vtkIdType Item)
+    {
+        return (this->GetInput()->GetVertexArea(Item));
+    }
+
+    int GetNumberOfDualItems() { return (this->Input->GetNumberOfCells()); };
 
 #ifdef DOmultithread
 
-	vtkIdList **VLists;
-	std::queue<vtkIdType> *VQueues;
+    vtkIdList** VLists;
+    std::queue<vtkIdType>* VQueues;
 
-	void Init()
-	{
-		VLists=new vtkIdList*[this->NumberOfThreads+1];
-		
-		for (int i=0;i<this->NumberOfThreads+1;i++)
-			VLists[i]=vtkIdList::New();
-		VQueues=new std::queue<vtkIdType>[this->NumberOfThreads+1];
-	
-		this->Processing::Init();
-	};
+    void Init()
+    {
+        VLists = new vtkIdList*[this->NumberOfThreads + 1];
 
-	void AddItemRingToProcess(vtkIdType Item,int ProcessId)
-	{
-		int NumberOfEdges,*Edges,i;
-		this->GetInput()->GetVertexNeighbourEdges(Item,NumberOfEdges,Edges);
-		for (i=0;i<NumberOfEdges;i++)
-			this->AddEdgeToProcess(Edges[i],ProcessId);
-	};
+        for (int i = 0; i < this->NumberOfThreads + 1; i++)
+            VLists[i] = vtkIdList::New();
+        VQueues = new std::queue<vtkIdType>[this->NumberOfThreads + 1];
 
-	int ThreadedConnexityConstraintProblem(vtkIdType Item,vtkIdType Edge,vtkIdType 
-Cluster, vtkIdType Cluster2, int Thread)
-	{
-		return ConnexityConstraintProblemLocal(Item,Edge,Cluster,this->VLists[Thread],this->VQueues[Thread]);
-	};
+        this->Processing::Init();
+    };
+
+    void AddItemRingToProcess(vtkIdType Item, int ProcessId)
+    {
+        int NumberOfEdges, *Edges, i;
+        this->GetInput()->GetVertexNeighbourEdges(Item, NumberOfEdges, Edges);
+        for (i = 0; i < NumberOfEdges; i++)
+            this->AddEdgeToProcess(Edges[i], ProcessId);
+    };
+
+    int ThreadedConnexityConstraintProblem(
+        vtkIdType Item,
+        vtkIdType Edge,
+        vtkIdType Cluster,
+        vtkIdType Cluster2,
+        int Thread)
+    {
+        return ConnexityConstraintProblemLocal(
+            Item, Edge, Cluster, this->VLists[Thread], this->VQueues[Thread]);
+    };
 #endif
 
 
 private:
+    std::queue<vtkIdType> VQueue;
+    vtkIdList* VList;
 
-	std::queue<vtkIdType> VQueue;
-	vtkIdList *VList;
+    void GetItemNeighbours(vtkIdType Item, vtkIdList* IList)
+    {
+        this->GetInput()->GetVertexNeighbours(Item, IList);
+    };
 
-	void GetItemNeighbours (vtkIdType Item, vtkIdList *IList)
-	{
-		this->GetInput()->GetVertexNeighbours(Item,IList); 
-	};
+    void AddItemRingToProcess(vtkIdType Item)
+    {
+        vtkIdType NumberOfEdges, *Edges, i;
+        this->GetInput()->GetVertexNeighbourEdges(Item, NumberOfEdges, Edges);
+        for (i = 0; i < NumberOfEdges; i++)
+            this->EdgeQueue.push(Edges[i]);
+    };
 
-	void AddItemRingToProcess(vtkIdType Item)
-	{
-		vtkIdType NumberOfEdges,*Edges,i;
-		this->GetInput()->GetVertexNeighbourEdges(Item,NumberOfEdges,Edges);
-		for (i=0;i<NumberOfEdges;i++)
-			this->EdgeQueue.push(Edges[i]);
-	};
+    void GetEdgeItems(vtkIdType Item, vtkIdType& I1, vtkIdType& I2)
+    {
+        this->GetInput()->GetEdgeVertices(Item, I1, I2);
+    };
 
-	void GetEdgeItems(vtkIdType Item, vtkIdType &I1,vtkIdType &I2)
-	{
-		this->GetInput()->GetEdgeVertices(Item,I1,I2);
-	};
+    void GetItemEdges(vtkIdType Item, vtkIdList* EList)
+    {
+        this->Input->GetVertexNeighbourEdges(Item, EList);
+    };
 
-	void GetItemEdges(vtkIdType Item, vtkIdList *EList)
-	{
-		this->Input->GetVertexNeighbourEdges(Item,EList);
-	};
+    /// check if moving the face Item from Cluster will not make Cluster
+    /// non-connex
+    int ConnexityConstraintProblem(
+        vtkIdType Item, vtkIdType Edge, vtkIdType Cluster, vtkIdType Cluster2)
+    {
+        return ConnexityConstraintProblemLocal(
+            Item, Edge, Cluster, this->VList, this->VQueue);
+    };
 
-	/// check if moving the face Item from Cluster will not make Cluster non-connex
-	int ConnexityConstraintProblem(vtkIdType Item,vtkIdType Edge,vtkIdType
-Cluster, vtkIdType Cluster2)
-	{
-		return ConnexityConstraintProblemLocal(Item,Edge,Cluster,this->VList,this->VQueue);
-	};
+    /// check if moving the face Item from Cluster will not make Cluster
+    /// non-connex
+    int ConnexityConstraintProblemLocal(
+        vtkIdType Item,
+        vtkIdType Edge,
+        vtkIdType Cluster,
+        vtkIdList* VList,
+        std::queue<vtkIdType>& VQueue)
+    {
+        if (!this->ConnexityConstraint)
+            return (0);
 
-	/// check if moving the face Item from Cluster will not make Cluster non-connex
-	int ConnexityConstraintProblemLocal(vtkIdType Item,vtkIdType Edge,vtkIdType
-Cluster, vtkIdList *VList, std::queue<vtkIdType> &VQueue)
-	{
-		if (!this->ConnexityConstraint)
-			return (0);
-		
-		VList->Reset();
-		while (VQueue.size())
-			VQueue.pop();
+        VList->Reset();
+        while (VQueue.size())
+            VQueue.pop();
 
-		vtkIdType v1,v2,v3,i,j,Cluster1,Cluster2;
-		vtkIdType NumberOfEdges,*Edges;
+        vtkIdType v1, v2, v3, i, j, Cluster1, Cluster2;
+        vtkIdType NumberOfEdges, *Edges;
 
-		this->GetInput()->GetVertexNeighbourEdges(Item,NumberOfEdges,Edges);
-		for (i=0;i<NumberOfEdges;i++)
-		{
-			this->Input->GetEdgeVertices(Edges[i],v1,v2);
-			Cluster1=this->Clustering->GetValue(v1);
-			Cluster2=this->Clustering->GetValue(v2);
-			if ((v1!=Item)&&(Cluster1==Cluster))
-				VList->InsertNextId(v1);
-			if ((v2!=Item)&&(Cluster2==Cluster))
-				VList->InsertNextId(v2);
-		}
+        this->GetInput()->GetVertexNeighbourEdges(Item, NumberOfEdges, Edges);
+        for (i = 0; i < NumberOfEdges; i++) {
+            this->Input->GetEdgeVertices(Edges[i], v1, v2);
+            Cluster1 = this->Clustering->GetValue(v1);
+            Cluster2 = this->Clustering->GetValue(v2);
+            if ((v1 != Item) && (Cluster1 == Cluster))
+                VList->InsertNextId(v1);
+            if ((v2 != Item) && (Cluster2 == Cluster))
+                VList->InsertNextId(v2);
+        }
 
-		if (VList->GetNumberOfIds()==0)
-			return (0);
+        if (VList->GetNumberOfIds() == 0)
+            return (0);
 
-		vtkIdType NumberOfVertices=VList->GetNumberOfIds();
-		vtkIdType NumberOfVisitedVertices=1;
+        vtkIdType NumberOfVertices = VList->GetNumberOfIds();
+        vtkIdType NumberOfVisitedVertices = 1;
 
-		v1=VList->GetId(0);
-		VList->DeleteId(v1);
+        v1 = VList->GetId(0);
+        VList->DeleteId(v1);
 
-		VQueue.push(v1);
-		while (VQueue.size())
-		{
-			v1=VQueue.front();
-			VQueue.pop();
-			this->GetInput()->GetVertexNeighbourEdges(v1,NumberOfEdges,Edges);
-			for (i=0;i<NumberOfEdges;i++)
-			{
+        VQueue.push(v1);
+        while (VQueue.size()) {
+            v1 = VQueue.front();
+            VQueue.pop();
+            this->GetInput()->GetVertexNeighbourEdges(v1, NumberOfEdges, Edges);
+            for (i = 0; i < NumberOfEdges; i++) {
                 this->Input->GetEdgeVertices(Edges[i],v2,v3);
-				for (j=0;j<VList->GetNumberOfIds();j++)
-				{
-					v1=VList->GetId(j);
-                    if (v1==v2)
-					{
-						VQueue.push(v2);
-						NumberOfVisitedVertices++;
-						VList->DeleteId(v2);
-						break;
-					}
-					else
-					{
-						if (v1==v3)
-						{
-							VQueue.push(v3);
-							NumberOfVisitedVertices++;
-							VList->DeleteId(v3);
-							break;
-						}
-					}
-				}
-			}
-		}
-		if (NumberOfVertices==NumberOfVisitedVertices)
-			return (0);
-		return 1;
-	};
+                for (j = 0; j < VList->GetNumberOfIds(); j++) {
+                    v1 = VList->GetId(j);
+                    if (v1 == v2) {
+                        VQueue.push(v2);
+                        NumberOfVisitedVertices++;
+                        VList->DeleteId(v2);
+                        break;
+                    } else {
+                        if (v1 == v3) {
+                            VQueue.push(v3);
+                            NumberOfVisitedVertices++;
+                            VList->DeleteId(v3);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (NumberOfVertices == NumberOfVisitedVertices)
+            return (0);
+        return 1;
+    };
 };
 #endif

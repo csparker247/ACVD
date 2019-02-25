@@ -49,44 +49,42 @@ Author:   Sebastien Valette
 int main( int argc, char *argv[] )
 {
 
-	//******************************************************************************************
-	// Inside input parameters:
-	int NumberOfVertices=0;	// the number of desired vertices
-	//*******************************************************************************************
+    //******************************************************************************************
+    // Inside input parameters:
+    int NumberOfVertices = 0;  // the number of desired vertices
+    //*******************************************************************************************
 
-	vtkSurface *Mesh=vtkSurface::New();
+    vtkSurface* Mesh = vtkSurface::New();
 
-	if(argc>2)
-	{
-		cout <<"load : "<<argv[1]<<endl;
-		Mesh->CreateFromFile(argv[1]);
-		NumberOfVertices=atoi(argv[2]);
-	}
-	else
-	{
-		cout<<"Usage : ManifoldSimplification file nvertices"<<endl;
-		cout<<"nvertices is the desired number of vertices"<<endl;
-		exit (1);
-	}
+    if (argc > 2) {
+        cout << "load : " << argv[1] << endl;
+        Mesh->CreateFromFile(argv[1]);
+        NumberOfVertices = atoi(argv[2]);
+    } else {
+        cout << "Usage : ManifoldSimplification file nvertices" << endl;
+        cout << "nvertices is the desired number of vertices" << endl;
+        exit(1);
+    }
 
-	Mesh->DisplayMeshProperties();
+    Mesh->DisplayMeshProperties();
 
-	vtkManifoldSimplification *Simplification=vtkManifoldSimplification::New();
-	Simplification->SetInput(Mesh);
-	Simplification->SetNumberOfOutputVertices(NumberOfVertices);
-	Simplification->Simplify();
-	vtkSurface *CleanOutput=Mesh->CleanMemory();
+    vtkManifoldSimplification* Simplification =
+        vtkManifoldSimplification::New();
+    Simplification->SetInput(Mesh);
+    Simplification->SetNumberOfOutputVertices(NumberOfVertices);
+    Simplification->Simplify();
+    vtkSurface* CleanOutput = Mesh->CleanMemory();
 
-	cout<<"Output mesh:"<<endl;
-	CleanOutput->DisplayMeshProperties();
+    cout << "Output mesh:" << endl;
+    CleanOutput->DisplayMeshProperties();
 
-	vtkPLYWriter *Writer=vtkPLYWriter::New();
-	Writer->SetInputData(CleanOutput);
-	Writer->SetFileName("output.ply");
-	Writer->Write();
-	Writer->Delete();
-	Simplification->Delete();
-	Mesh->Delete();
-	CleanOutput->Delete();
-	return (0);
+    vtkPLYWriter* Writer = vtkPLYWriter::New();
+    Writer->SetInputData(CleanOutput);
+    Writer->SetFileName("output.ply");
+    Writer->Write();
+    Writer->Delete();
+    Simplification->Delete();
+    Mesh->Delete();
+    CleanOutput->Delete();
+    return (0);
 }

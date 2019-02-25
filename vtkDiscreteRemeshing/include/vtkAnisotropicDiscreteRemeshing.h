@@ -49,25 +49,22 @@ typedef vtkDiscreteRemeshing<vtkQuadricAnisotropicMetricForClustering> QuadricAn
 class VTK_EXPORT vtkAnisotropicDiscreteRemeshing : public vtkVerticesProcessing<QuadricAnisotropicRemeshing>
 {
 public:
-
-	static vtkAnisotropicDiscreteRemeshing* New()
-	{
-		// First try to	create the object from the vtkObjectFactory
-		vtkObject* ret = vtkObjectFactory::CreateInstance("vtkAnisotropicDiscreteRemeshing");
-		if(ret)
-		{
-			return (vtkAnisotropicDiscreteRemeshing*)ret;
-		}
-		// If the factory was unable to	create the object, then	create it here.
-		return (new	vtkAnisotropicDiscreteRemeshing);
-	}
+    static vtkAnisotropicDiscreteRemeshing* New()
+    {
+        // First try to    create the object from the vtkObjectFactory
+        vtkObject* ret =
+            vtkObjectFactory::CreateInstance("vtkAnisotropicDiscreteRemeshing");
+        if (ret) {
+            return (vtkAnisotropicDiscreteRemeshing*)ret;
+        }
+        // If the factory was unable to    create the object, then    create it
+        // here.
+        return (new vtkAnisotropicDiscreteRemeshing);
+    }
 
 protected:
-
-	vtkAnisotropicDiscreteRemeshing()
-	{
-	}
-	~vtkAnisotropicDiscreteRemeshing() {};
+    vtkAnisotropicDiscreteRemeshing() {}
+    ~vtkAnisotropicDiscreteRemeshing(){};
 };
 
 #endif

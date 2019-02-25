@@ -39,37 +39,35 @@ class VTK_EXPORT vtkDualMeshDisplay : public vtkObject
 {
 
 public:
+    /// The Constructor vtkSurfaceToDual::New();
+    static vtkDualMeshDisplay* New();
+    vtkTypeMacro(vtkDualMeshDisplay, vtkObject);
 
-	/// The Constructor vtkSurfaceToDual::New();
-	static vtkDualMeshDisplay *New();
-	vtkTypeMacro(vtkDualMeshDisplay,vtkObject);
+    void SetInputData(vtkSurface* Input);
 
-	void SetInputData(vtkSurface *Input);
+    void SetColors(vtkIntArray* Colors);
 
-	void SetColors(vtkIntArray *Colors);
+    vtkSurface* GetOutput();
 
-	vtkSurface* GetOutput();
+    RenderWindow* GetRenderWindow();
 
-	RenderWindow *GetRenderWindow();
-	
-	void Update();
+    void Update();
 
 protected:
+    void CreateDual();
 
-	void CreateDual();
+    RenderWindow* Window;
 
-	RenderWindow *Window;
+    vtkIntArray* Colors;
 
-	vtkIntArray *Colors;
-	
-	vtkSurface *Input;
+    vtkSurface* Input;
 
-	vtkSurface *Dual;
+    vtkSurface* Dual;
 
-	/// constructor
-	vtkDualMeshDisplay();
+    /// constructor
+    vtkDualMeshDisplay();
 
-	/// desctructor
-	~vtkDualMeshDisplay();
+    /// desctructor
+    ~vtkDualMeshDisplay();
 };
 #endif

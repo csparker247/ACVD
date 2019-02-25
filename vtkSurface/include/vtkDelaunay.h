@@ -46,106 +46,109 @@ class VTK_EXPORT vtkDelaunay : public vtkObject
 {
 
 public:
+    // the constructor
+    static vtkDelaunay* New();
 
-	// the constructor
-	static vtkDelaunay *New();
+    // Sets the mesh to modify
+    void SetInputData(vtkSurface* Input);
 
-	// Sets the mesh to modify
-	void SetInputData(vtkSurface *Input);
+    // This method flips the edges of the input mesh until all its edges meet
+    // the Delaunay criterion
+    void DelaunayConform();
 
-	// This method flips the edges of the input mesh until all its edges meet the Delaunay criterion
-	void DelaunayConform();
+    // This method is intended to be used before vtkDelaunay::Update for each
+    // potentially flippable edge this is faster than
+    // vtkDelaunay::DelaunayConform() which tests all the edges of the mesh
+    void PushEdge(vtkIdType Edge);
 
-	// This method is intended to be used before vtkDelaunay::Update for each potentially flippable edge
-	// this is faster than vtkDelaunay::DelaunayConform() which tests all the edges of the mesh
-	void PushEdge(vtkIdType Edge);
+    // After the user has pushed the edges that might be flipped, the call to
+    // Update() processes them
+    void Update();
 
-	// After the user has pushed the edges that might be flipped, the call to Update() processes them
-	void Update();
-	
-	// returns the number of flips performed during the call to Update()
-	int GetNumberOfFlipedEdges()
-	{return this->NumberOfPerformedFlips;};
-	
-	// Derive these methods when you want to do additionnal operations when an edge is flipped
-	virtual void UpdateEdge(vtkIdType Edge){};
-	virtual bool IsEdgeFlippable(vtkIdType Edge);
+    // returns the number of flips performed during the call to Update()
+    int GetNumberOfFlipedEdges() { return this->NumberOfPerformedFlips; };
 
-	static	double ComputeDelaunayConformingCriterion( vtkSurface *Mesh,const vtkIdType& Edge )
-	{
-		vtkIdType v1, v2, v3, v4;
-		vtkIdType f1, f2;
-		double p1[3], p2[3], p3[3], p4[3];
-		double v31[3], v32[3], v41[3], v42[3];
-		double dot3 = 0.;
-		double dot4 = 0.;
-		double norm31 = 0.;
-		double norm32 = 0.;
-		double norm41 = 0.;
-		double norm42 = 0.;
+    // Derive these methods when you want to do additionnal operations when an
+    // edge is flipped
+    virtual void UpdateEdge(vtkIdType Edge){};
+    virtual bool IsEdgeFlippable(vtkIdType Edge);
 
-		Mesh->GetEdgeFaces( Edge, f1, f2 );
-		if (f2<0)
-			return (-1.0);
+    static double ComputeDelaunayConformingCriterion(
+        vtkSurface* Mesh, const vtkIdType& Edge)
+    {
+        vtkIdType v1, v2, v3, v4;
+        vtkIdType f1, f2;
+        double p1[3], p2[3], p3[3], p4[3];
+        double v31[3], v32[3], v41[3], v42[3];
+        double dot3 = 0.;
+        double dot4 = 0.;
+        double norm31 = 0.;
+        double norm32 = 0.;
+        double norm41 = 0.;
+        double norm42 = 0.;
 
-		Mesh->GetEdgeVertices( Edge, v1, v2 );
-		v3 = Mesh->GetThirdPoint( f1, v1, v2 );
-		v4 = Mesh->GetThirdPoint( f2, v1, v2 );
+        Mesh->GetEdgeFaces(Edge, f1, f2);
+        if (f2 < 0)
+            return (-1.0);
 
-		Mesh->GetPointCoordinates( v1, p1 );
-		Mesh->GetPointCoordinates( v2, p2 );
-		Mesh->GetPointCoordinates( v3, p3 );
-		Mesh->GetPointCoordinates( v4, p4 );
+        Mesh->GetEdgeVertices(Edge, v1, v2);
+        v3 = Mesh->GetThirdPoint(f1, v1, v2);
+        v4 = Mesh->GetThirdPoint(f2, v1, v2);
 
-		for( unsigned int dim = 0; dim < 3; dim++ )
-		{
-			v31[dim] = p1[dim] - p3[dim]; norm31 += v31[dim] * v31[dim];
-			v32[dim] = p2[dim] - p3[dim]; norm32 += v32[dim] * v32[dim];
-			dot3 += v31[dim] * v32[dim];
+        Mesh->GetPointCoordinates(v1, p1);
+        Mesh->GetPointCoordinates(v2, p2);
+        Mesh->GetPointCoordinates(v3, p3);
+        Mesh->GetPointCoordinates(v4, p4);
 
-			v41[dim] = p1[dim] - p4[dim]; norm41 += v41[dim] * v41[dim];
-			v42[dim] = p2[dim] - p4[dim]; norm42 += v42[dim] * v42[dim];
-			dot4 += v41[dim] * v42[dim];
-		}
-		double den = norm31 * norm32;
+        for (unsigned int dim = 0; dim < 3; dim++) {
+            v31[dim] = p1[dim] - p3[dim];
+            norm31 += v31[dim] * v31[dim];
+            v32[dim] = p2[dim] - p3[dim];
+            norm32 += v32[dim] * v32[dim];
+            dot3 += v31[dim] * v32[dim];
 
-		if( den != 0. )
-		{
-			den = sqrt( den );
-			dot3 /= den;
-		}
+            v41[dim] = p1[dim] - p4[dim];
+            norm41 += v41[dim] * v41[dim];
+            v42[dim] = p2[dim] - p4[dim];
+            norm42 += v42[dim] * v42[dim];
+            dot4 += v41[dim] * v42[dim];
+        }
+        double den = norm31 * norm32;
 
-		if( dot3 > 1. )
-			dot3 = 1.;
-		if( dot3 < -1. )
-			dot3 = -1.;
+        if (den != 0.) {
+            den = sqrt(den);
+            dot3 /= den;
+        }
 
-		den = norm41 * norm42;
+        if (dot3 > 1.)
+            dot3 = 1.;
+        if (dot3 < -1.)
+            dot3 = -1.;
 
-		if( den != 0. )
-		{
-			den = sqrt( den );
-			dot4 /= den;
-		}
+        den = norm41 * norm42;
 
-		if( dot4 > 1. )
-			dot4 = 1.;
-		if( dot4 < -1. )
-			dot4 = -1.;
+        if (den != 0.) {
+            den = sqrt(den);
+            dot4 /= den;
+        }
 
-		return (acos( dot3 ) + acos( dot4 ) -  3.14159265358979323846);
-	}
+        if (dot4 > 1.)
+            dot4 = 1.;
+        if (dot4 < -1.)
+            dot4 = -1.;
+
+        return (acos(dot3) + acos(dot4) - 3.14159265358979323846);
+    }
 
 protected:
+    vtkSurface* Mesh;
 
-	vtkSurface *Mesh;
+    vtkPriorityQueue* NonDelaunayEdges;
 
-	vtkPriorityQueue *NonDelaunayEdges;
-	
-	int NumberOfPerformedFlips;
+    int NumberOfPerformedFlips;
 
-	vtkDelaunay();
-	virtual	~vtkDelaunay();
+    vtkDelaunay();
+    virtual ~vtkDelaunay();
 };
 
 #endif

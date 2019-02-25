@@ -104,82 +104,79 @@ void vtkVolumeProperties::Update()
 // Currently, the input is a ploydata which consists of triangles.
 void vtkVolumeProperties::Execute()
 {
-	vtkIdList *ptIds;
-	vtkPolyData *input = this->GetInputData();
-	int cellId, numCells, numPts, numIds;
-	double *p;
+    vtkIdList* ptIds;
+    vtkPolyData* input = this->GetInputData();
+    int cellId, numCells, numPts, numIds;
+    double* p;
 
-	numCells=input->GetNumberOfCells();
-	numPts = input->GetNumberOfPoints();
-	if (numCells < 1 || numPts < 1)
-	{
-		vtkErrorMacro(<<"No data to measure...!");
-		return;
-	}
+    numCells = input->GetNumberOfCells();
+    numPts = input->GetNumberOfPoints();
+    if (numCells < 1 || numPts < 1) {
+        vtkErrorMacro(<< "No data to measure...!");
+        return;
+    }
 
-	ptIds = vtkIdList::New();
-	ptIds->Allocate(VTK_CELL_SIZE);
+    ptIds = vtkIdList::New();
+    ptIds->Allocate(VTK_CELL_SIZE);
 
-	//
-	// Traverse all cells, obtaining node coordinates.
-	//
-	double    u[3],v[3],w[3],bary[3],m[3];
-	double    P1[3],P2[3],P3[3];
-	int      idx;
+    //
+    // Traverse all cells, obtaining node coordinates.
+    //
+    double u[3], v[3], w[3], bary[3], m[3];
+    double P1[3], P2[3], P3[3];
+    int idx;
 
-	for ( idx =0; idx < 3 ; idx++ ) 
-		bary[idx]  = 0.0;
+    for (idx = 0; idx < 3; idx++)
+        bary[idx] = 0.0;
 
-	//coordonnees du barycentre du maillage
-	for ( idx=0; idx < numPts ; idx++)
-	{
-		p = input->GetPoint(idx);
-		bary[0] += p[0];
-		bary[1] += p[1];
-		bary[2] += p[2];
-	}
+    // coordonnees du barycentre du maillage
+    for (idx = 0; idx < numPts; idx++) {
+        p = input->GetPoint(idx);
+        bary[0] += p[0];
+        bary[1] += p[1];
+        bary[2] += p[2];
+    }
 
-	bary[0] /= (double) numPts ;
-	bary[1] /= (double) numPts ;
-	bary[2] /= (double) numPts ;
+    bary[0] /= (double)numPts;
+    bary[1] /= (double)numPts;
+    bary[2] /= (double)numPts;
 
-	this->XG = bary[0] ;
-	this->YG = bary[1] ;
-	this->ZG = bary[2] ;
-	
-	this->SurfaceArea=0;
-	this->SignedVolume=0;
+    this->XG = bary[0];
+    this->YG = bary[1];
+    this->ZG = bary[2];
 
-	//parcours de toutes les cellules
-	for (cellId=0; cellId < numCells; cellId++)
-	{
-		if ( input->GetCellType(cellId) != VTK_TRIANGLE)
-		{
-			vtkErrorMacro(<<"Sorry Data type has to be VTK_TRIANGLE only " << input->GetCellType(cellId));
-			return;
-		}
-		input->GetCellPoints(cellId,ptIds);
-		numIds = ptIds->GetNumberOfIds();
-		input->GetPoint(ptIds->GetId(0),P1);
-		input->GetPoint(ptIds->GetId(1),P2);
-		input->GetPoint(ptIds->GetId(2),P3);
-		
-		for (int i=0;i<3;i++)
-		{
-			u[i]=P1[i]-bary[i];
-			v[i]=P2[i]-bary[i];
-			w[i]=P3[i]-bary[i];
-		}
-		
-		vtkMath::Cross(v,w,m);
-		this->SignedVolume+=vtkMath::Dot(m,u)/6.0;
-		this->SurfaceArea+= vtkTriangle::TriangleArea(P1,P2,P3);
-		
-	}
+    this->SurfaceArea = 0;
+    this->SignedVolume = 0;
 
-	this->Volume = fabs(this->SignedVolume) ;
-	this->NormalizedShapeIndex = (sqrt(this->SurfaceArea)/VTK_CUBE_ROOT(this->Volume))/2.199085233;
-	ptIds->Delete();
+    // parcours de toutes les cellules
+    for (cellId = 0; cellId < numCells; cellId++) {
+        if (input->GetCellType(cellId) != VTK_TRIANGLE) {
+            vtkErrorMacro(
+                << "Sorry Data type has to be VTK_TRIANGLE only "
+                << input->GetCellType(cellId));
+            return;
+        }
+        input->GetCellPoints(cellId, ptIds);
+        numIds = ptIds->GetNumberOfIds();
+        input->GetPoint(ptIds->GetId(0), P1);
+        input->GetPoint(ptIds->GetId(1), P2);
+        input->GetPoint(ptIds->GetId(2), P3);
+
+        for (int i = 0; i < 3; i++) {
+            u[i] = P1[i] - bary[i];
+            v[i] = P2[i] - bary[i];
+            w[i] = P3[i] - bary[i];
+        }
+
+        vtkMath::Cross(v, w, m);
+        this->SignedVolume += vtkMath::Dot(m, u) / 6.0;
+        this->SurfaceArea += vtkTriangle::TriangleArea(P1, P2, P3);
+    }
+
+    this->Volume = fabs(this->SignedVolume);
+    this->NormalizedShapeIndex =
+        (sqrt(this->SurfaceArea) / VTK_CUBE_ROOT(this->Volume)) / 2.199085233;
+    ptIds->Delete();
 }
 
 /*void vtkVolumeProperties::PrintSelf(ostream& os, vtkIndent indent)

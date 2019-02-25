@@ -28,16 +28,14 @@
 class  vtkClusteringTest
 {
 public:
+    vtkClusteringExample<vtkMetricExample>* Test;
 
-	vtkClusteringExample<vtkMetricExample> *Test;
+    vtkClusteringTest()
+    {
+        Test = vtkClusteringExample<vtkMetricExample>::New();
 
-			
-vtkClusteringTest()
-{
-	Test=vtkClusteringExample<vtkMetricExample>::New();
-
-	Test->ProcessClustering();
-	Test->Delete();
+        Test->ProcessClustering();
+        Test->Delete();
 }
 ~vtkClusteringTest()
 {}

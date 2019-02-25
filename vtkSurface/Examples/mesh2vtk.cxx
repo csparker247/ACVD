@@ -43,21 +43,21 @@ Author:   Sebastien Valette
 
 int main( int argc, char *argv[] )
 {
-	vtkSurface *Mesh;
+    vtkSurface* Mesh;
 
-	if (argc<2) {
-		cout<<"Usage : mesh2vtk inputmesh"<<endl;
-		exit(1);
-	}
+    if (argc < 2) {
+        cout << "Usage : mesh2vtk inputmesh" << endl;
+        exit(1);
+    }
 
-	// Load the mesh and create the vtkSurface data structure
-	Mesh=vtkSurface::New();
-	cout <<"load : "<<argv[1]<<endl;
-	Mesh->CreateFromFile(argv[1]);
-	vtkPolyDataWriter *Writer=vtkPolyDataWriter::New();
-	Writer->SetInputData(Mesh);
-	Writer->SetFileName("mesh.vtk");
-	Writer->Write();
-	cout<<"conversion to mesh.vtk finished!"<<endl;
-	return (0);
+    // Load the mesh and create the vtkSurface data structure
+    Mesh = vtkSurface::New();
+    cout << "load : " << argv[1] << endl;
+    Mesh->CreateFromFile(argv[1]);
+    vtkPolyDataWriter* Writer = vtkPolyDataWriter::New();
+    Writer->SetInputData(Mesh);
+    Writer->SetFileName("mesh.vtk");
+    Writer->Write();
+    cout << "conversion to mesh.vtk finished!" << endl;
+    return (0);
 }

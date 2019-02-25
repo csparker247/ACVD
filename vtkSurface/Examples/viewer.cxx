@@ -43,40 +43,39 @@ Author:   Sebastien Valette
 
 int main( int argc, char *argv[] )
 {
-	RenderWindow **Window=new RenderWindow*[argc-1];
-	vtkSurface *Mesh;
+    RenderWindow** Window = new RenderWindow*[argc - 1];
+    vtkSurface* Mesh;
 
-	for (int i=0;i<argc-1;i++)
-	{
-	
-		// Load the mesh and create the vtkSurface data structure
-		Mesh=vtkSurface::New();
-		cout <<"load : "<<argv[i+1]<<endl;
-		Mesh->CreateFromFile(argv[i+1]);
+    for (int i = 0; i < argc - 1; i++) {
 
-		// prints to standard output the mesh caracteristics
-		Mesh->DisplayMeshProperties();
+        // Load the mesh and create the vtkSurface data structure
+        Mesh = vtkSurface::New();
+        cout << "load : " << argv[i + 1] << endl;
+        Mesh->CreateFromFile(argv[i + 1]);
 
-		// Create a renderwindow
-		Window[i]=RenderWindow::New();
-		Window[i]->SetInputData(Mesh);
+        // prints to standard output the mesh caracteristics
+        Mesh->DisplayMeshProperties();
 
-		// synchronize the viewport with the first created window		
-		if (i>0)
-			Window[i]->AttachToRenderWindow(Window[0]);
+        // Create a renderwindow
+        Window[i] = RenderWindow::New();
+        Window[i]->SetInputData(Mesh);
 
-		Window[i]->Render();
-		Window[i]->SetWindowName(argv[i+1]);
-		Mesh->Delete();
-	}
+        // synchronize the viewport with the first created window
+        if (i > 0)
+            Window[i]->AttachToRenderWindow(Window[0]);
 
-	// start interaction
-	Window[0]->Interact();
-	
-	// Delete objects before exit
-	for (int i=0;i<argc-1;i++)
-		Window[i]->Delete();
-	delete [] Window;
+        Window[i]->Render();
+        Window[i]->SetWindowName(argv[i + 1]);
+        Mesh->Delete();
+    }
 
-	return (0);
+    // start interaction
+    Window[0]->Interact();
+
+    // Delete objects before exit
+    for (int i = 0; i < argc - 1; i++)
+        Window[i]->Delete();
+    delete[] Window;
+
+    return (0);
 }

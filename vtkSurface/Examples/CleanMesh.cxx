@@ -26,90 +26,85 @@
 
 int main( int argc, char *argv[] )
 {
-	if (argc<3)
-	{
-		cout<<"Usage : CleanMesh input output"<<endl;
-		exit (1);
-	}
-	vtkSurface *Mesh=vtkSurface::New();
-	Mesh->CreateFromFile(argv[1]);
-	vtkPolyData *OriginalMesh=vtkPolyData::New();
-	OriginalMesh->DeepCopy(Mesh);
+    if (argc < 3) {
+        cout << "Usage : CleanMesh input output" << endl;
+        exit(1);
+    }
+    vtkSurface* Mesh = vtkSurface::New();
+    Mesh->CreateFromFile(argv[1]);
+    vtkPolyData* OriginalMesh = vtkPolyData::New();
+    OriginalMesh->DeepCopy(Mesh);
 
-	cout<<"Input : "<<endl;
-	Mesh->DisplayMeshProperties();
+    cout << "Input : " << endl;
+    Mesh->DisplayMeshProperties();
 
-	int numCells=Mesh->GetNumberOfCells();
+    int numCells = Mesh->GetNumberOfCells();
 
-	vtkIdList *List=vtkIdList::New();
+    vtkIdList* List = vtkIdList::New();
 
-	bool OK=false;
-	int Rank=3;
-	int Loop=0;
-	while (!OK)
-	{
-		OK=true;
-		int NumberOfCleanups=0;
-		for (int i=0;i<numCells;i++)
-		{
-			if (Mesh->IsFaceActive(i))
-			{
-				vtkIdType vertices[4];
-				Mesh->GetFaceVertices(i,vertices[0],vertices[1],vertices[2]);
-				vertices[3]=vertices[0];
-				vtkIdType edges[3];
-				int NumberOfNonManifoldEdges=0;
-				int NumberOfBoundaryEdges=0;
-				for (int j=0;j<3;j++)
-				{
-					edges[j]=Mesh->IsEdge(vertices[j],vertices[j+1]);
-					Mesh->GetEdgeFaces(edges[j],List);
-					if (List->GetNumberOfIds()>2)
-						NumberOfNonManifoldEdges++;
+    bool OK = false;
+    int Rank = 3;
+    int Loop = 0;
+    while (!OK) {
+        OK = true;
+        int NumberOfCleanups = 0;
+        for (int i = 0; i < numCells; i++) {
+            if (Mesh->IsFaceActive(i)) {
+                vtkIdType vertices[4];
+                Mesh->GetFaceVertices(i, vertices[0], vertices[1], vertices[2]);
+                vertices[3] = vertices[0];
+                vtkIdType edges[3];
+                int NumberOfNonManifoldEdges = 0;
+                int NumberOfBoundaryEdges = 0;
+                for (int j = 0; j < 3; j++) {
+                    edges[j] = Mesh->IsEdge(vertices[j], vertices[j + 1]);
+                    Mesh->GetEdgeFaces(edges[j], List);
+                    if (List->GetNumberOfIds() > 2)
+                        NumberOfNonManifoldEdges++;
 
-					if (List->GetNumberOfIds()==1)
-						NumberOfBoundaryEdges++;
-				}
-				if ((NumberOfNonManifoldEdges!=0)&&(NumberOfNonManifoldEdges+NumberOfBoundaryEdges>Rank))
-				{
-					Mesh->DeleteFace(i);
-					NumberOfCleanups++;
-					OK=false;
-				}
-			}
-		}
-		cout<<"Loop "<<Loop<<" , Rank:"<<Rank<<" , "<<NumberOfCleanups<<" faces deleted"<<endl;
-		Loop++;
-		if (OK)
-		{
-			Rank--;
-			OK=false;
-			if (Rank==0)
-				break;
-		}
-	}
+                    if (List->GetNumberOfIds() == 1)
+                        NumberOfBoundaryEdges++;
+                }
+                if ((NumberOfNonManifoldEdges != 0) &&
+                    (NumberOfNonManifoldEdges + NumberOfBoundaryEdges > Rank)) {
+                    Mesh->DeleteFace(i);
+                    NumberOfCleanups++;
+                    OK = false;
+                }
+            }
+        }
+        cout << "Loop " << Loop << " , Rank:" << Rank << " , "
+             << NumberOfCleanups << " faces deleted" << endl;
+        Loop++;
+        if (OK) {
+            Rank--;
+            OK = false;
+            if (Rank == 0)
+                break;
+        }
+    }
 
-	Mesh->CheckNormals();
-	vtkSurface *CleanMesh=Mesh->CleanMemory();
-	cout<<"Output : "<<endl;
-	CleanMesh->DisplayMeshProperties();
+    Mesh->CheckNormals();
+    vtkSurface* CleanMesh = Mesh->CleanMemory();
+    cout << "Output : " << endl;
+    CleanMesh->DisplayMeshProperties();
 
-	RenderWindow *Window=RenderWindow::New();
-	Window->SetInputData(OriginalMesh);
-	Window->Render();
+    RenderWindow* Window = RenderWindow::New();
+    Window->SetInputData(OriginalMesh);
+    Window->Render();
 
-	RenderWindow *Window2=RenderWindow::New();
-	Window2->SetInputData(CleanMesh);
-	Window2->AttachToRenderWindow(Window);
-	Window2->Render();
-	Window2->Interact();
+    RenderWindow* Window2 = RenderWindow::New();
+    Window2->SetInputData(CleanMesh);
+    Window2->AttachToRenderWindow(Window);
+    Window2->Render();
+    Window2->Interact();
 
-	//delete objects
-	Window->Delete();
-	Window2->Delete();
-	OriginalMesh->Delete();
-	Mesh->Delete();
-	CleanMesh->Delete();
+    // delete objects
+    Window->Delete();
+    Window2->Delete();
+    OriginalMesh->Delete();
+    Mesh->Delete();
+    CleanMesh->Delete();
 
-	return(0);
+    return (0);
 }

@@ -43,39 +43,37 @@ Author:   Sebastien Valette
 
 int main( int argc, char *argv[] )
 {
-	RenderWindow *Window=RenderWindow::New();
+    RenderWindow* Window = RenderWindow::New();
 
-	vtkSurface *Mesh;
-	for (int i=0;i<argc-1;i++)
-	{
-		// Load the mesh and create the vtkSurface data structure
-		Mesh=vtkSurface::New();
-		cout <<"load : "<<argv[i+1]<<endl;
-		Mesh->CreateFromFile(argv[i+1]);
+    vtkSurface* Mesh;
+    for (int i = 0; i < argc - 1; i++) {
+        // Load the mesh and create the vtkSurface data structure
+        Mesh = vtkSurface::New();
+        cout << "load : " << argv[i + 1] << endl;
+        Mesh->CreateFromFile(argv[i + 1]);
 
-		// prints to standard output the mesh caracteristics
-		Mesh->DisplayMeshProperties();
+        // prints to standard output the mesh caracteristics
+        Mesh->DisplayMeshProperties();
 
-		// Create a renderwindow
-		if (i==0)
-			Window->SetInputData(Mesh);
-		else
-			Window->AddPolyData(Mesh);
+        // Create a renderwindow
+        if (i == 0)
+            Window->SetInputData(Mesh);
+        else
+            Window->AddPolyData(Mesh);
 
-		Window->SetWindowName(argv[i+1]);
-		Mesh->Delete();
-	}
+        Window->SetWindowName(argv[i + 1]);
+        Mesh->Delete();
+    }
 
-	// start display and interaction
-	Window->Render();
-	Window->Interact();
-	
-	vtkOBJExporter *Export=vtkOBJExporter::New();
-	Export->SetInput(Window->GetvtkRenderWindow());
-	Export->SetFilePrefix("export");
-	Export->Write();
-	
-	
-	Window->Delete();
-	return (0);
+    // start display and interaction
+    Window->Render();
+    Window->Interact();
+
+    vtkOBJExporter* Export = vtkOBJExporter::New();
+    Export->SetInput(Window->GetvtkRenderWindow());
+    Export->SetFilePrefix("export");
+    Export->Write();
+
+    Window->Delete();
+    return (0);
 }

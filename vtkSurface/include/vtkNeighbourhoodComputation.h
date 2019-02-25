@@ -39,59 +39,57 @@ email                :
 class VTK_EXPORT vtkNeighbourhoodComputation : public vtkObject
 {
 public:
-	/// the public constructor
-	static vtkNeighbourhoodComputation* New();
+    /// the public constructor
+    static vtkNeighbourhoodComputation* New();
 
-	/// Method to initialize the class for a specific Input
-	void SetInputData(vtkSurface *Mesh);
+    /// Method to initialize the class for a specific Input
+    void SetInputData(vtkSurface* Mesh);
 
-	/// Compute the NRing around the Cell.
-	void ComputeNRingCells(vtkIdType Cell,int RingSize,vtkIdList *FList);
+    /// Compute the NRing around the Cell.
+    void ComputeNRingCells(vtkIdType Cell, int RingSize, vtkIdList* FList);
 
-	/// Compute the Cells around the input cell within the input Distance.
-	void ComputeDistanceRingCells (vtkIdType Cell,double Distance, vtkIdList *FList);
+    /// Compute the Cells around the input cell within the input Distance.
+    void ComputeDistanceRingCells(
+        vtkIdType Cell, double Distance, vtkIdList* FList);
 
-	// Defines the type of the origin cells (0=faces 1=Vertices)
-	void SetCellType (int Type)
-	{ this->CellType=Type;};
+    // Defines the type of the origin cells (0=faces 1=Vertices)
+    void SetCellType(int Type) { this->CellType = Type; };
 
-	/// Returns the Input mesh
-	vtkSurface *GetInput(){return (this->Input);};
+    /// Returns the Input mesh
+    vtkSurface* GetInput() { return (this->Input); };
 
 protected:
-
-	vtkNeighbourhoodComputation();
-	~vtkNeighbourhoodComputation();
+    vtkNeighbourhoodComputation();
+    ~vtkNeighbourhoodComputation();
 
 private:
+    // Type of the origin cells (0=faces 1=Vertices)
+    int CellType;
 
-	// Type of the origin cells (0=faces 1=Vertices)
-	int CellType;
-	
-	// this parameter stores the number of times the methods 
-	// ComputeNRingCells() or ComputeDistanceRingCells() were called.
-	int Time;
-	
-	// this method increases the "Time" class member, and check wether there is an overflow.
-	// In case of overflow, Time is reset to 0 and the visited fields are also reset.
-	// Note : overflow will very unlikely happen , unless you call for Neighborhood computation 
-	// a lot of times (more INT_MAX)
-	void IncreaseTime();
-	
-	// Reset the arrays defining whether an item was already visited
-	void InitArrays();
+    // this parameter stores the number of times the methods
+    // ComputeNRingCells() or ComputeDistanceRingCells() were called.
+    int Time;
 
-	// The input mesh
-	vtkSurface *Input;
+    // this method increases the "Time" class member, and check wether there is
+    // an overflow. In case of overflow, Time is reset to 0 and the visited
+    // fields are also reset. Note : overflow will very unlikely happen , unless
+    // you call for Neighborhood computation a lot of times (more INT_MAX)
+    void IncreaseTime();
 
-	// those arrays define which elements have already been visited
-	vtkIntArray *VisitedCells;
-	vtkIntArray *VisitedEdges;
-	vtkIntArray *VisitedVertices;
+    // Reset the arrays defining whether an item was already visited
+    void InitArrays();
 
-	// IdLists statically created to speed up the neighborhood computation
-	vtkIdList *VList;
-	vtkIdList *VList2;
-	vtkIdList *EList;
+    // The input mesh
+    vtkSurface* Input;
+
+    // those arrays define which elements have already been visited
+    vtkIntArray* VisitedCells;
+    vtkIntArray* VisitedEdges;
+    vtkIntArray* VisitedVertices;
+
+    // IdLists statically created to speed up the neighborhood computation
+    vtkIdList* VList;
+    vtkIdList* VList2;
+    vtkIdList* EList;
 };
 #endif

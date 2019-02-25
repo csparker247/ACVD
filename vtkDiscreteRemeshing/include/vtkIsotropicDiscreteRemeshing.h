@@ -55,50 +55,44 @@ typedef vtkDiscreteRemeshing<vtkIsotropicMetricForClustering> IsotropicRemeshing
 class VTK_EXPORT vtkIsotropicDiscreteRemeshing : public vtkVerticesProcessing<IsotropicRemeshing>
 {
 public:
-
-	static vtkIsotropicDiscreteRemeshing* New()
-	{
-		// First try to	create the object from the vtkObjectFactory
-		vtkObject* ret = vtkObjectFactory::CreateInstance("vtkIsotropicDiscreteRemeshing");
-		if(ret)
-		{
-			return (vtkIsotropicDiscreteRemeshing*)ret;
-		}
-		// If the factory was unable to	create the object, then	create it here.
-		return (new	vtkIsotropicDiscreteRemeshing);
-	}
+    static vtkIsotropicDiscreteRemeshing* New()
+    {
+        // First try to    create the object from the vtkObjectFactory
+        vtkObject* ret =
+            vtkObjectFactory::CreateInstance("vtkIsotropicDiscreteRemeshing");
+        if (ret) {
+            return (vtkIsotropicDiscreteRemeshing*)ret;
+        }
+        // If the factory was unable to    create the object, then    create it
+        // here.
+        return (new vtkIsotropicDiscreteRemeshing);
+    }
 
 protected:
-
-	vtkIsotropicDiscreteRemeshing()
-	{
-	}
-	~vtkIsotropicDiscreteRemeshing() {};
+    vtkIsotropicDiscreteRemeshing() {}
+    ~vtkIsotropicDiscreteRemeshing(){};
 };
 
 typedef vtkDiscreteRemeshing<vtkQEMetricForClustering> TempQERemeshing;
 class VTK_EXPORT vtkQIsotropicDiscreteRemeshing : public vtkVerticesProcessing<TempQERemeshing>
 {
 public:
-
-	static vtkQIsotropicDiscreteRemeshing* New()
-	{
-		// First try to	create the object from the vtkObjectFactory
-		vtkObject* ret = vtkObjectFactory::CreateInstance("vtkQIsotropicDiscreteRemeshing");
-		if(ret)
-		{
-			return (vtkQIsotropicDiscreteRemeshing*)ret;
-		}
-		// If the factory was unable to	create the object, then	create it here.
-		return (new	vtkQIsotropicDiscreteRemeshing);
-	}
+    static vtkQIsotropicDiscreteRemeshing* New()
+    {
+        // First try to    create the object from the vtkObjectFactory
+        vtkObject* ret =
+            vtkObjectFactory::CreateInstance("vtkQIsotropicDiscreteRemeshing");
+        if (ret) {
+            return (vtkQIsotropicDiscreteRemeshing*)ret;
+        }
+        // If the factory was unable to    create the object, then    create it
+        // here.
+        return (new vtkQIsotropicDiscreteRemeshing);
+    }
 
 protected:
-
-	vtkQIsotropicDiscreteRemeshing()
-	{
-	}
-	~vtkQIsotropicDiscreteRemeshing() {};
+    vtkQIsotropicDiscreteRemeshing() {}
+    ~vtkQIsotropicDiscreteRemeshing(){};
 };
 
 #endif

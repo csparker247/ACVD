@@ -40,25 +40,23 @@ class vtkTransform;
 class VTK_EXPORT vtkOOCMetaImageReader : public vtkImageReader2
 {
 public:
-	static vtkOOCMetaImageReader *New();
-	//{return new vtkOOCMetaImageReader;};
+    static vtkOOCMetaImageReader* New();
+    //{return new vtkOOCMetaImageReader;};
 
-	vtkGetMacro(XMin, int);
-	vtkSetMacro(XMin, int);
-	vtkGetMacro(XMax, int);
-	vtkSetMacro(XMax, int);
-	vtkGetMacro(YMin, int);
-	vtkSetMacro(YMin, int);
-	vtkGetMacro(YMax, int);
-	vtkSetMacro(YMax, int);
-	vtkGetMacro(ZMin, int);
-	vtkSetMacro(ZMin, int);
-	vtkGetMacro(ZMax, int);
-	vtkSetMacro(ZMax, int);
+    vtkGetMacro(XMin, int);
+    vtkSetMacro(XMin, int);
+    vtkGetMacro(XMax, int);
+    vtkSetMacro(XMax, int);
+    vtkGetMacro(YMin, int);
+    vtkSetMacro(YMin, int);
+    vtkGetMacro(YMax, int);
+    vtkSetMacro(YMax, int);
+    vtkGetMacro(ZMin, int);
+    vtkSetMacro(ZMin, int);
+    vtkGetMacro(ZMax, int);
+    vtkSetMacro(ZMax, int);
 
-
-
-  //Meta-File reading functionality
+    // Meta-File reading functionality
     virtual const char * GetFileExtensions() 
     { return ".mhd .mha"; }
 
@@ -185,7 +183,6 @@ protected:
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector);
 
-	
   //This is the method where the actual reading of the file takes places. As such, it should
   //replicate vtkImageReader's functionality because it's this class that permets the lecture of
   //regions of interest

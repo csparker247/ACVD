@@ -18,24 +18,26 @@ Auteur:   Sebastien Valette
 
 int main( int argc, char *argv[] )
 {
-	vtkImageData *Image=0;
+    vtkImageData* Image = 0;
 
-	// Load and Display Image
-	cout <<"load : "<<argv[1]<<endl;
+    // Load and Display Image
+    cout << "load : " << argv[1] << endl;
 
-	vtkPNGReader *Reader=vtkPNGReader::New();
-	Reader->SetFileName(argv[1]);
-	Reader->Update();
-	Image=Reader->GetOutput();
+    vtkPNGReader* Reader = vtkPNGReader::New();
+    Reader->SetFileName(argv[1]);
+    Reader->Update();
+    Image = Reader->GetOutput();
 
-	/*vtkImageViewer2 *Viewer=vtkImageViewer2::New();
-	Viewer->SetInput(Image);
+    /*vtkImageViewer2 *Viewer=vtkImageViewer2::New();
+    Viewer->SetInput(Image);
 
-	vtkRenderWindowInteractor *Interactor=vtkRenderWindowInteractor::New();
-	Viewer->SetupInteractor(Interactor);
-	Interactor->Start();
-	Viewer->Render();
+    vtkRenderWindowInteractor *Interactor=vtkRenderWindowInteractor::New();
+    Viewer->SetupInteractor(Interactor);
+    Interactor->Start();
+    Viewer->Render();
 */
-	cout<<"Scalar Type : "<<Image->GetScalarType()<<endl;
-	cout<<"Valeur "<<*(unsigned short*)Image->GetScalarPointer(220,272,0)<<endl;;
+    cout << "Scalar Type : " << Image->GetScalarType() << endl;
+    cout << "Valeur " << *(unsigned short*)Image->GetScalarPointer(220, 272, 0)
+         << endl;
+    ;
 }

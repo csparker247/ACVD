@@ -53,53 +53,51 @@ template < class Metric > class vtkSurfaceClustering:public vtkUniformClustering
 {
 
 public:
+    /// Sets the Input mesh
+    void SetInput(vtkSurface* Input);
 
-	/// Sets the Input mesh
-	void SetInput(vtkSurface *Input);
-	
-	/// Returns the Input mesh
-	vtkSurface* GetInput() {return (this->Input);};
+    /// Returns the Input mesh
+    vtkSurface* GetInput() { return (this->Input); };
 
-	/// Returns the Rendering window used for display
-	RenderWindow* GetDisplayWindow(){return(this->Window);};
+    /// Returns the Rendering window used for display
+    RenderWindow* GetDisplayWindow() { return (this->Window); };
 
-	vtkIdType GetNumberOfEdges() {return this->Input->GetNumberOfEdges();}
+    vtkIdType GetNumberOfEdges() { return this->Input->GetNumberOfEdges(); }
 
-	void GetEdgeItemsSure (vtkIdType Item, vtkIdList * VList)
-	{
-		if (this->ClusteringType == 0)
-			this->GetInput ()->GetEdgeFaces (Item, VList);
-		else
-		{
-			vtkIdType v1, v2;
-			VList->Reset ();
-			this->Input->GetEdgeVertices (Item, v1, v2);
-			VList->InsertNextId (v1);
-			VList->InsertNextId (v2);
-		}
-	};
+    void GetEdgeItemsSure(vtkIdType Item, vtkIdList* VList)
+    {
+        if (this->ClusteringType == 0)
+            this->GetInput()->GetEdgeFaces(Item, VList);
+        else {
+            vtkIdType v1, v2;
+            VList->Reset();
+            this->Input->GetEdgeVertices(Item, v1, v2);
+            VList->InsertNextId(v1);
+            VList->InsertNextId(v2);
+        }
+    };
 
-	vtkGetMacro(ClusteringType,int);
+    vtkGetMacro(ClusteringType, int);
 
 protected:
-	/// Parameter indicating the type of Clustering (0: Faces ;1:Vertices)
-	int ClusteringType;
+    /// Parameter indicating the type of Clustering (0: Faces ;1:Vertices)
+    int ClusteringType;
 
-	virtual int GetNumberOfDualItems()=0;
+    virtual int GetNumberOfDualItems() = 0;
 
-	void CreateWindows();
-	void InteractWithClusteringWindow();
-	void Snapshot();
-	void BuildMetric();
+    void CreateWindows();
+    void InteractWithClusteringWindow();
+    void Snapshot();
+    void BuildMetric();
 
-	vtkSurfaceClustering ();
-	~vtkSurfaceClustering ();
+    vtkSurfaceClustering();
+    ~vtkSurfaceClustering();
 
-	/// The input vtkSurface
-	vtkSurface *Input;	
-	
-	/// The window where the clustering is displayed
-	RenderWindow *Window;
+    /// The input vtkSurface
+    vtkSurface* Input;
+
+    /// The window where the clustering is displayed
+    RenderWindow* Window;
 };
 
 
@@ -107,122 +105,115 @@ protected:
 template <class Metric>
 void vtkSurfaceClustering<Metric>::BuildMetric()
 {
-	this->MetricContext.BuildMetric(this->Clusters,this->Input,this->NumberOfClusters,this->ClusteringType);
+    this->MetricContext.BuildMetric(
+        this->Clusters, this->Input, this->NumberOfClusters,
+        this->ClusteringType);
 }
 
 template <class Metric>
 void vtkSurfaceClustering<Metric>::CreateWindows()
 {
-	if (this->Display)
-	{
-		Window=RenderWindow::New();
-		Window->SetInputData(this->Input);
-		if (this->AnchorRenderWindow)
-			Window->AttachToRenderWindow(this->AnchorRenderWindow);
-		else
-			this->AnchorRenderWindow=Window;
+    if (this->Display) {
+        Window = RenderWindow::New();
+        Window->SetInputData(this->Input);
+        if (this->AnchorRenderWindow)
+            Window->AttachToRenderWindow(this->AnchorRenderWindow);
+        else
+            this->AnchorRenderWindow = Window;
 
-		if (this->ClusteringType==1)
-		{
-			this->Input->GetCellData()->SetScalars(0);
-			this->Input->GetPointData()->SetScalars(this->Clustering);
-		}
-		else
-		{
-			this->Input->GetCellData()->SetScalars(this->Clustering);
-			this->Input->GetPointData()->SetScalars(0);
-		}
+        if (this->ClusteringType == 1) {
+            this->Input->GetCellData()->SetScalars(0);
+            this->Input->GetPointData()->SetScalars(this->Clustering);
+        } else {
+            this->Input->GetCellData()->SetScalars(this->Clustering);
+            this->Input->GetPointData()->SetScalars(0);
+        }
 
-		Window->DisplayRandomColors(this->NumberOfClusters+1);
-		Window->Render();
-		Window->SetWindowName("Clustering");
+        Window->DisplayRandomColors(this->NumberOfClusters + 1);
+        Window->Render();
+        Window->SetWindowName("Clustering");
 
-		Window->Interact();
+        Window->Interact();
 
-
-		if (this->Display>2)
-		{
-			std::stringstream strfile;
-			strfile<<"movie/mesh"<<(this->FrameNumber++)+1000<<".png";
-			Window->Capture(strfile.str().c_str());
-		}
-	}
+        if (this->Display > 2) {
+            std::stringstream strfile;
+            strfile << "movie/mesh" << (this->FrameNumber++) + 1000 << ".png";
+            Window->Capture(strfile.str().c_str());
+        }
+    }
 }
 
 template <class Metric>
 void vtkSurfaceClustering<Metric>::Snapshot()
 {
-	if (this->Display)
-	{
-		this->Clustering->Modified();
-		Window->Render();
-		if (this->Display>2)
-		{
-			std::stringstream strfile;
-			strfile<<"movie/mesh"<<(this->FrameNumber++)+1000<<".png";
-			Window->Capture(strfile.str().c_str());
-		}		
-	}
+    if (this->Display) {
+        this->Clustering->Modified();
+        Window->Render();
+        if (this->Display > 2) {
+            std::stringstream strfile;
+            strfile << "movie/mesh" << (this->FrameNumber++) + 1000 << ".png";
+            Window->Capture(strfile.str().c_str());
+        }
+    }
 }
 template <class Metric>
 void vtkSurfaceClustering<Metric>::InteractWithClusteringWindow()
 {
-	if (this->Display)
-	{
-		this->Window->Render();
-		this->Window->Interact();
-	}
+    if (this->Display) {
+        this->Window->Render();
+        this->Window->Interact();
+    }
 }
 
 
 template <class Metric>
 void vtkSurfaceClustering<Metric>::SetInput(vtkSurface *Input)
 {
-	if (this->Input)
-		this->Input->UnRegister(this);
+    if (this->Input)
+        this->Input->UnRegister(this);
 
-	vtkIdType NV, *Vertices;
-	bool trianglesOnly = true;
-	for (vtkIdType i = 0; i < Input->GetNumberOfCells(); i++) {
-		if (Input->IsFaceActive(i)) {
-			Input->GetCellPoints(i, NV, Vertices);
-			if (NV != 3) {
-				trianglesOnly = false;
-				break;
-			}
-		}
-	}
+    vtkIdType NV, *Vertices;
+    bool trianglesOnly = true;
+    for (vtkIdType i = 0; i < Input->GetNumberOfCells(); i++) {
+        if (Input->IsFaceActive(i)) {
+            Input->GetCellPoints(i, NV, Vertices);
+            if (NV != 3) {
+                trianglesOnly = false;
+                break;
+            }
+        }
+    }
 
-	if (!trianglesOnly) {
-		// triangulate the mesh if it contains polygons
-		vtkTriangleFilter *triangulate = vtkTriangleFilter::New();
-		triangulate->SetInputData(Input);
-		triangulate->PassVertsOff ();
-		triangulate->Update();
-		Input = vtkSurface::New();
-		Input->CreateFromPolyData(triangulate->GetOutput());
-		triangulate->Delete();
-	}
+    if (!trianglesOnly) {
+        // triangulate the mesh if it contains polygons
+        vtkTriangleFilter* triangulate = vtkTriangleFilter::New();
+        triangulate->SetInputData(Input);
+        triangulate->PassVertsOff();
+        triangulate->Update();
+        Input = vtkSurface::New();
+        Input->CreateFromPolyData(triangulate->GetOutput());
+        triangulate->Delete();
+    }
 
-	this->Input=Input;
-	if (Input)
-		this->Input->Register(this);
+    this->Input = Input;
+    if (Input)
+        this->Input->Register(this);
 };
 
 
 template <class Metric> vtkSurfaceClustering<Metric>::vtkSurfaceClustering ()
 {
-	this->AnchorRenderWindow=0;
-	this->Input=0;
-	this->Window=0;
+    this->AnchorRenderWindow = 0;
+    this->Input = 0;
+    this->Window = 0;
 }
 
 template <class Metric> vtkSurfaceClustering<Metric>::~vtkSurfaceClustering ()
 {
-	if (this->Input)
-		this->Input->Delete();
-		
-	if (this->Window)
-		this->Window->Delete();
+    if (this->Input)
+        this->Input->Delete();
+
+    if (this->Window)
+        this->Window->Delete();
 }
 #endif

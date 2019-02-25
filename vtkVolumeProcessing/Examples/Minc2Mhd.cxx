@@ -18,20 +18,19 @@ Auteur:   Sebastien Valette
 int main( int argc, char *argv[] )
 {
 
-	if (argc<3)
-	{
-		cout<<"Usage : Minc2Mhd file.mnc file.mhd"<<endl;
-		exit(1);
-	}
+    if (argc < 3) {
+        cout << "Usage : Minc2Mhd file.mnc file.mhd" << endl;
+        exit(1);
+    }
 
-	// Load Volume
-	cout <<"load : "<<argv[1]<<endl;
+    // Load Volume
+    cout << "load : " << argv[1] << endl;
 
-	vtkMINCImageReader *Reader=vtkMINCImageReader::New();
-	Reader->SetFileName(argv[1]);
-	Reader->Update();
-	vtkMetaImageWriter *Writer=vtkMetaImageWriter::New();
-	Writer->SetInputData(Reader->GetOutput());
-	Writer->SetFileName(argv[2]);
-	Writer->Write();
+    vtkMINCImageReader* Reader = vtkMINCImageReader::New();
+    Reader->SetFileName(argv[1]);
+    Reader->Update();
+    vtkMetaImageWriter* Writer = vtkMetaImageWriter::New();
+    Writer->SetInputData(Reader->GetOutput());
+    Writer->SetFileName(argv[2]);
+    Writer->Write();
 }

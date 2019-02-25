@@ -38,168 +38,103 @@ vtkClusteringExample:public vtkUniformClustering <Metric,EdgeType>
 {
 
 public:
-	static vtkClusteringExample *New()
-	{
-		vtkObject* ret = vtkObjectFactory::CreateInstance("vtkClusteringExample");
-		if(ret)
-	    {
-			return (vtkClusteringExample*)ret;
-	    }
-	  // If the factory was unable to create the object, then create it here.
-		return (new vtkClusteringExample<Metric>);
-	};
-
-
-protected:
-	vtkClusteringExample() 
-	{
-	};
-
-	~vtkClusteringExample()
-	{};
-
-	void GetItemCoordinates(vtkIdType Item, double *P)
-	{
-	}
-	
-	double GetItemArea(vtkIdType Item)
-	{
-	return (0);
-	}
-
-	int GetNumberOfDualItems()
-	{return (0);};
-
-
-
-
-	void GetItemNeighbours (vtkIdType Item, vtkIdList *IList)
-	{
-	};
-
-	int GetNumberOfItems ()
-	{
-	return (0);
-	};
-
-	void AddItemRingToProcess(vtkIdType Item)
-	{
-//			this->AddEdgeToProcess();
-	};
-
-	void GetEdgeItems(vtkIdType Item, vtkIdType &I1,vtkIdType &I2)
-	{
-	};
-
-	void GetItemEdges(vtkIdType Item, vtkIdList *EList)
-	{
-	}
-
-	/// check if moving the face Item from Cluster will not make Cluster non-connex
-	/// returns 0 if no problem; 1 otherwise
-	int ConnexityConstraintProblem(vtkIdType Item,EdgeType Edge,vtkIdType Cluster, vtkIdType Cluster2)
-	{
-		if (!this->ConnexityConstraint)
-			return (0);
-	
-	return (0);
-	};
-
-
-	EdgeType GetNumberOfEdges()
-	{
-	return (0);
-	};
-
-	void GetEdgeItemsSure (vtkIdType Item, vtkIdList * VList)
-	{};
-	
-
-	void SetNumberOfProcesses (int N)
-	{};
+    static vtkClusteringExample* New()
+    {
+        vtkObject* ret =
+            vtkObjectFactory::CreateInstance("vtkClusteringExample");
+        if (ret) {
+            return (vtkClusteringExample*)ret;
+        }
+        // If the factory was unable to create the object, then create it here.
+        return (new vtkClusteringExample<Metric>);
+    };
 
 protected:
+    vtkClusteringExample(){};
 
-	int NumberOfProcesses;
+    ~vtkClusteringExample(){};
 
-	void CreateWindows(){};
-	void Snapshot(){};
-	void BuildMetric(){};
+    void GetItemCoordinates(vtkIdType Item, double* P) {}
+
+    double GetItemArea(vtkIdType Item) { return (0); }
+
+    int GetNumberOfDualItems() { return (0); };
+
+    void GetItemNeighbours(vtkIdType Item, vtkIdList* IList){};
+
+    int GetNumberOfItems() { return (0); };
+
+    void AddItemRingToProcess(vtkIdType Item){
+        //            this->AddEdgeToProcess();
+    };
+
+    void GetEdgeItems(vtkIdType Item, vtkIdType& I1, vtkIdType& I2){};
+
+    void GetItemEdges(vtkIdType Item, vtkIdList* EList) {}
+
+    /// check if moving the face Item from Cluster will not make Cluster
+    /// non-connex returns 0 if no problem; 1 otherwise
+    int ConnexityConstraintProblem(
+        vtkIdType Item, EdgeType Edge, vtkIdType Cluster, vtkIdType Cluster2)
+    {
+        if (!this->ConnexityConstraint)
+            return (0);
+
+        return (0);
+    };
+
+    EdgeType GetNumberOfEdges() { return (0); };
+
+    void GetEdgeItemsSure(vtkIdType Item, vtkIdList* VList){};
+
+    void SetNumberOfProcesses(int N){};
+
+protected:
+    int NumberOfProcesses;
+
+    void CreateWindows(){};
+    void Snapshot(){};
+    void BuildMetric(){};
 };
 
 class  vtkMetricExample
 {
 public:
+    void SetConstrainedClustering(int C){};
 
-	void SetConstrainedClustering(int C){};
+    struct Item {
+        double Weight;
+    };
 
-	struct Item
-	{
-		double Weight;
-	};
+    void ResetItem(Item* I) {}
 
-	void ResetItem(Item *I) 
-	{
-	}
+    double GetItemWeight(vtkIdType Item) { return 0; }
 
-	double GetItemWeight(vtkIdType Item) 
-	{
-		return 0;
-	}
+    struct Cluster {
+        double SWeight;
+    };
 
-	struct Cluster 
-	{
-		double SWeight;
-	};
+    double GetClusterEnergy(Cluster* C) { return (0); }
 
-	double GetClusterEnergy(Cluster *C)
-	{
-	return (0);
-	}
+    void ComputeClusterEnergy(Cluster* C) {}
 
-	void ComputeClusterEnergy(Cluster *C)
-	{
-	}
+    void DeepCopy(Cluster* Source, Cluster* Destination) {}
 
-	void DeepCopy(Cluster *Source, Cluster *Destination)
-	{
-	}
+    void Add(Cluster* Source, vtkIdType ItemId, Cluster* Destination) {}
 
-	void Add(Cluster *Source, vtkIdType ItemId, Cluster *Destination)
-	{
-	}
+    void AddItemToCluster(vtkIdType Item, Cluster* C) {}
 
-	void AddItemToCluster(vtkIdType Item, Cluster *C)
-	{
-	}
+    void Sub(Cluster* Source, vtkIdType ItemId, Cluster* Destination) {}
 
-	void Sub(Cluster *Source, vtkIdType ItemId, Cluster *Destination)
-	{
-	}
+    void SubstractItemFromCluster(vtkIdType Item, Cluster* C) {}
+    void ComputeClusterCentroid(Cluster* C) {}
 
-	void SubstractItemFromCluster(vtkIdType Item,Cluster *C)
-	{
-	}
-	void ComputeClusterCentroid(Cluster *C)
-	{
-	}
+    void GetClusterCentroid(Cluster* C, double* P) {}
+    void SetClusterCentroid(Cluster* C, double* P) {}
+    void ResetCluster(Cluster* C) {}
 
-	void GetClusterCentroid(Cluster *C, double *P)
-	{
-	}
-	void SetClusterCentroid(Cluster *C, double *P)
-	{
-	}
-	void ResetCluster(Cluster *C) 
-	{
-	}
-
-	vtkMetricExample()
-	{
-	};
-	~vtkMetricExample()
-	{
-	};
+    vtkMetricExample(){};
+    ~vtkMetricExample(){};
 };
 
 #endif

@@ -58,145 +58,146 @@
 class VTK_EXPORT vtkSurface : public vtkSurfaceBase
 {
 public:
+    /// returns a vtkSurface with no empty memory slots
+    vtkSurface* CleanMemory();
 
-	/// returns a vtkSurface with no empty memory slots
-	vtkSurface *CleanMemory();
+    /// Adds uniform noise to the model. The noise distribution is uniform, and
+    /// its strength depends on Magnitude*BoundingBoxDiagonalLength
+    void AddNoise(double Magnitude);
 
-	/// Adds uniform noise to the model. The noise distribution is uniform, and its strength
-	/// depends on Magnitude*BoundingBoxDiagonalLength
-	void AddNoise(double Magnitude);
+    /// Returns the points bounding box diagonal length
+    double GetBoundingBoxDiagonalLength();
 
-	/// Returns the points bounding box diagonal length
-	double GetBoundingBoxDiagonalLength();
+    /// Recusrsively splits the edges longer than Ratio*AverageLength
+    void SplitLongEdges(double Ratio);
 
-	/// Recusrsively splits the edges longer than Ratio*AverageLength
-	void SplitLongEdges (double Ratio);
+    /// returns a mesh which is a linear subdivision of this
+    vtkSurface* Subdivide(vtkIntArray* Parent1 = 0, vtkIntArray* Parent2 = 0);
 
-	/// returns a mesh which is a linear subdivision of this
-	vtkSurface *Subdivide(vtkIntArray *Parent1=0, vtkIntArray *Parent2=0);
+    /// subdivide the mesh (in place)
+    void SubdivideInPlace(vtkIntArray* Parent1 = 0, vtkIntArray* Parent2 = 0);
 
-	/// subdivide the mesh (in place)
-	void SubdivideInPlace(vtkIntArray *Parent1=0, vtkIntArray *Parent2=0);
+    /// copy to stream the connectivity and geometric properties of the mesh
+    void GetMeshProperties(std::stringstream& stream);
 
-	/// copy to stream the connectivity and geometric properties of the mesh
-	void GetMeshProperties(std::stringstream &stream);
+    /// same as GetMeshProperties, but the properties are displayed on screen
+    void DisplayMeshProperties();
 
-	/// same as GetMeshProperties, but the properties are displayed on screen
-	void DisplayMeshProperties();
-	
-	/// Switch the whole mesh orientation if its normals are not directed outwards.
-	/// This is done by computing the signed volume of the mesh
-	void EnsureOutwardsNormals();
+    /// Switch the whole mesh orientation if its normals are not directed
+    /// outwards. This is done by computing the signed volume of the mesh
+    void EnsureOutwardsNormals();
 
-	/// Computes the normal of the given triangle
-	void GetTriangleNormal(vtkIdType Triangle, double *Normal);
+    /// Computes the normal of the given triangle
+    void GetTriangleNormal(vtkIdType Triangle, double* Normal);
 
-	/// Computes the normal at a vertex (works only for triangular meshes)
-	void GetVertexNormal(vtkIdType Vertex, double *Normal);
-	
-	/// returns the legth of the input edge;
-	double GetEdgeLength(vtkIdType Edge);
+    /// Computes the normal at a vertex (works only for triangular meshes)
+    void GetVertexNormal(vtkIdType Vertex, double* Normal);
 
-	/// returns the normals of the mesh triangles
-	vtkDoubleArray *GetTrianglesNormals();
-	void DeleteTrianglesNormals();
+    /// returns the legth of the input edge;
+    double GetEdgeLength(vtkIdType Edge);
 
-	// returns the area of a given cell and its barycenter
-	void GetCellMassProperties(vtkIdType CellId, double &Area, double *Baricenter);
+    /// returns the normals of the mesh triangles
+    vtkDoubleArray* GetTrianglesNormals();
+    void DeleteTrianglesNormals();
 
-	/// Computes the Triangles Areas
-	vtkDoubleArray * GetTrianglesAreas();
-	void DeleteTrianglesAreas();
+    // returns the area of a given cell and its barycenter
+    void GetCellMassProperties(
+        vtkIdType CellId, double& Area, double* Baricenter);
 
-	/// Returns the area of the Face
-	double GetFaceArea(vtkIdType Face);
+    /// Computes the Triangles Areas
+    vtkDoubleArray* GetTrianglesAreas();
+    void DeleteTrianglesAreas();
 
-	/// returns a polydata of the mesh edges only
-	vtkPolyData *GetEdgesPolyData();
+    /// Returns the area of the Face
+    double GetFaceArea(vtkIdType Face);
 
-	/// returns a polydata of the mesh vertices only
-	vtkPolyData *GetVerticesPolyData();
+    /// returns a polydata of the mesh edges only
+    vtkPolyData* GetEdgesPolyData();
 
-	/// rescale the points so that the maximum coordinates range is equal to 1
-	void RescaleCoordinates();
+    /// returns a polydata of the mesh vertices only
+    vtkPolyData* GetVerticesPolyData();
 
-	/// Returns the euclidian distance between the vertices V1 and V2
-	double GetDistanceBetweenVertices(vtkIdType V1,vtkIdType V2);
+    /// rescale the points so that the maximum coordinates range is equal to 1
+    void RescaleCoordinates();
 
-	/// Builds a 1 connected component mesh from the mesh in two steps:
-	/// First: merge the points which are closer than the given relative tolerance
-	/// Second : add fictive edges between unconnected components
-	vtkSurface* CleanConnectivity(double tolerance);
+    /// Returns the euclidian distance between the vertices V1 and V2
+    double GetDistanceBetweenVertices(vtkIdType V1, vtkIdType V2);
 
-	/// Computes the area of Vertex (it will actually compute the area of the
-	/// Surrounding cells divided by their respective number of vertices)
-	double GetVertexArea(vtkIdType Vertex);
+    /// Builds a 1 connected component mesh from the mesh in two steps:
+    /// First: merge the points which are closer than the given relative
+    /// tolerance Second : add fictive edges between unconnected components
+    vtkSurface* CleanConnectivity(double tolerance);
 
-	/// Computes the Vertices Areas with respect to their surrounding cells
-	vtkDoubleArray* GetVerticesAreas();
-	void DeleteVerticesAreas();
+    /// Computes the area of Vertex (it will actually compute the area of the
+    /// Surrounding cells divided by their respective number of vertices)
+    double GetVertexArea(vtkIdType Vertex);
 
-	/// Computes the Mesh Edges Lengths in an array
-	vtkDoubleArray* GetEdgeLengths();
-	void DeleteEdgeLengths();
+    /// Computes the Vertices Areas with respect to their surrounding cells
+    vtkDoubleArray* GetVerticesAreas();
+    void DeleteVerticesAreas();
 
-	/// Computes the connected components of the mesh
-	vtkIdListCollection* GetConnectedComponents();
-	void DeleteConnectedComponents();
+    /// Computes the Mesh Edges Lengths in an array
+    vtkDoubleArray* GetEdgeLengths();
+    void DeleteEdgeLengths();
 
-	/// returns a vtkSurface made of the biggest connected component
-	vtkSurface *GetBiggestConnectedComponent();
+    /// Computes the connected components of the mesh
+    vtkIdListCollection* GetConnectedComponents();
+    void DeleteConnectedComponents();
 
-   /// Computes the mesh minimal angle, average minimal angle, minimal triangle quality and average triangle quality
-   /// usefull to give an objective quality criterion of the mesh
-   void ComputeTrianglesStatistics(double &Amin, double & Aav,double &Qmin, double &Qav, double &P30);
+    /// returns a vtkSurface made of the biggest connected component
+    vtkSurface* GetBiggestConnectedComponent();
 
-   /// Computes the histogram of triangles quality and writes it in a file
-   void ComputeQualityHistogram(const char *FileName);
+    /// Computes the mesh minimal angle, average minimal angle, minimal triangle
+    /// quality and average triangle quality usefull to give an objective
+    /// quality criterion of the mesh
+    void ComputeTrianglesStatistics(
+        double& Amin, double& Aav, double& Qmin, double& Qav, double& P30);
 
-   /// Creates the vtkSurface object by reading a mesh file.
-   /// Supported file types : .wrl, .vtk and .ply
-   void CreateFromFile (const char *FileName);
+    /// Computes the histogram of triangles quality and writes it in a file
+    void ComputeQualityHistogram(const char* FileName);
 
-   /// Saves the mesh
-   /// Supported file types : .vtk and .ply
-   void WriteToFile (const char *FileName);
+    /// Creates the vtkSurface object by reading a mesh file.
+    /// Supported file types : .wrl, .vtk and .ply
+    void CreateFromFile(const char* FileName);
 
-   /// The Constructor vtkSurface::New();
-   static vtkSurface *New();
+    /// Saves the mesh
+    /// Supported file types : .vtk and .ply
+    void WriteToFile(const char* FileName);
 
-   vtkTypeMacro(vtkSurface,vtkSurfaceBase);
+    /// The Constructor vtkSurface::New();
+    static vtkSurface* New();
 
-   /// Create a similar type object.
-   vtkDataObject *MakeObject()
-     {return vtkSurface::New();};
+    vtkTypeMacro(vtkSurface, vtkSurfaceBase);
 
-   /// Quantizes the coordinates of the mesh to integers
-   /// (dynamic range : q bits)
-   void QuantizeCoordinates(int q);
+    /// Create a similar type object.
+    vtkDataObject* MakeObject() { return vtkSurface::New(); };
 
-   /// Quantizes the coordinates of the mesh to integers
-   /// (quantization parameters will be the same as Input
-   void QuantizeCoordinatesLike(vtkSurface *Mesh);
+    /// Quantizes the coordinates of the mesh to integers
+    /// (dynamic range : q bits)
+    void QuantizeCoordinates(int q);
 
-     /// Quantizes the coordinates of the mesh to integers
-   /// (quantization parameters must be given
-   void QuantizeCoordinates(double Factor, double Tx, double Ty, double Tz);
+    /// Quantizes the coordinates of the mesh to integers
+    /// (quantization parameters will be the same as Input
+    void QuantizeCoordinatesLike(vtkSurface* Mesh);
 
+    /// Quantizes the coordinates of the mesh to integers
+    /// (quantization parameters must be given
+    void QuantizeCoordinates(double Factor, double Tx, double Ty, double Tz);
 
-   /// Writes the mesh to a .iv file
-   void WriteInventor(const char *filename);
+    /// Writes the mesh to a .iv file
+    void WriteInventor(const char* filename);
 
-   /// Writes the mesh to a .smf file
-   void WriteSMF(const char *filename);
+    /// Writes the mesh to a .smf file
+    void WriteSMF(const char* filename);
 
-   /// Computes the list of sharp vertices
-   void ComputeSharpVertices(double treshold);
+    /// Computes the list of sharp vertices
+    void ComputeSharpVertices(double treshold);
 
-   /// Returns 1 if v is a sharp vertex
-   /// Otherwise Returns 0.
-   int IsSharpVertex(vtkIdType v)
-     {return (this->SharpVertices->GetValue(v));};
+    /// Returns 1 if v is a sharp vertex
+    /// Otherwise Returns 0.
+    int IsSharpVertex(vtkIdType v)
+    {
+        return (this->SharpVertices->GetValue(v));};
 
    /// Cancels the computation of the sharp vertices list
    void DeleteSharpVertices() ;
@@ -223,30 +224,32 @@ public:
    /// sets the scaling factors used for quantization
    void SetScalingFactors (vtkSurface *Mesh)
      {
-	double Factor,Tx,Ty,Tz;
-	Mesh->GetScalingFactors(Factor,Tx,Ty,Tz);
-       this->Factor=Factor;
-       this->Tx=Tx;
-       this->Ty=Ty;
-       this->Tz=Tz;
+         double Factor, Tx, Ty, Tz;
+         Mesh->GetScalingFactors(Factor, Tx, Ty, Tz);
+         this->Factor = Factor;
+         this->Tx = Tx;
+         this->Ty = Ty;
+         this->Tz = Tz;
      };
 
    void UnQuantizeScalingFactors ();
    void UnQuantizeCoordinates();
 
-	void PrintVerticesCoordinates();
-	void PrintConnectivity();
-	void SaveConnectivity(const char * FileName);
+   void PrintVerticesCoordinates();
+   void PrintConnectivity();
+   void SaveConnectivity(const char* FileName);
 
-    void WriteMeshStatisticsFile( const char* AreaFileName, const char* QFileName,
-                             const char* AngleMinFileName, const char* DegreeFileName );
+   void WriteMeshStatisticsFile(
+       const char* AreaFileName,
+       const char* QFileName,
+       const char* AngleMinFileName,
+       const char* DegreeFileName);
 
-protected:
+   protected:
+   vtkSurface();
+   ~vtkSurface();
 
-	vtkSurface();
-	~vtkSurface();
-
-private:
+   private:
 
    /// Attribute on the vertices:
    vtkIntArray *SharpVertices;
@@ -255,19 +258,16 @@ private:
    vtkDoubleArray *TrianglesAreas;
    vtkDoubleArray *TrianglesNormals;
 
-	vtkDoubleArray *EdgeLengths;
+   vtkDoubleArray* EdgeLengths;
 
-
-	/// parameters used for quantization
+   /// parameters used for quantization
    double Tx;
    double Ty;
    double Tz;
    double Factor;
 
-	/// A Collection of IdLists containing Ids of each connected component
-	vtkIdListCollection* ConnectedComponents;
-
-
+   /// A Collection of IdLists containing Ids of each connected component
+   vtkIdListCollection* ConnectedComponents;
 };
 
 

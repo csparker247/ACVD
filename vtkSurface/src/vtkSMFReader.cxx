@@ -50,12 +50,13 @@
 // Instantiate object with NULL filename.
 vtkSMFReader* vtkSMFReader::New()
 {
-	  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkSMFReader");
-  if(ret) return (vtkSMFReader*)ret;
+    // First try to create the object from the vtkObjectFactory
+    vtkObject* ret = vtkObjectFactory::CreateInstance("vtkSMFReader");
+    if (ret)
+        return (vtkSMFReader*)ret;
 
-  // If the factory was unable to create the object, then create it here.
-  return new vtkSMFReader;
+    // If the factory was unable to create the object, then create it here.
+    return new vtkSMFReader;
 }
 
 vtkSMFReader::vtkSMFReader()
@@ -74,141 +75,115 @@ vtkSMFReader::~vtkSMFReader()
 
 int vtkSMFReader::AddVertex(char *line, vtkPoints *points)
 {
-	// this is a vertex definition, expect three floats, separated by whitespace:
-	float xyz[3];
+    // this is a vertex definition, expect three floats, separated by
+    // whitespace:
+    float xyz[3];
 
-	int everything_ok = 1;
+    int everything_ok = 1;
 
-	if (sscanf(line, "v %f %f %f", xyz, xyz + 1, xyz + 2)==3) 
-	{
-		points->InsertNextPoint(xyz);
-	}
-	else 
-	{
-		vtkErrorMacro(<<"Error in reading file");
-		everything_ok=0; // (false)
-	}
-	return everything_ok;
+    if (sscanf(line, "v %f %f %f", xyz, xyz + 1, xyz + 2) == 3) {
+        points->InsertNextPoint(xyz);
+    } else {
+        vtkErrorMacro(<< "Error in reading file");
+        everything_ok = 0;  // (false)
+    }
+    return everything_ok;
 }
 
 int vtkSMFReader::AddFace(char *line, vtkCellArray *polys)
 {
-	// this is a face definition, expect three integer, separated by whitespace:
-	int temp[3];
-	vtkIdList *iFace = vtkIdList::New();
-	iFace->SetNumberOfIds(3);
-	
-	int everything_ok = 1;
+    // this is a face definition, expect three integer, separated by whitespace:
+    int temp[3];
+    vtkIdList* iFace = vtkIdList::New();
+    iFace->SetNumberOfIds(3);
 
-	if (sscanf(line, "f %d %d %d", temp, temp+1, temp+2)==3) 
-	{
-		for(int i=0; i<3; i++)
-			iFace->SetId(i,temp[i]-1);
-		polys->InsertNextCell(iFace);
-	}
-	else 
-	{
-		vtkErrorMacro(<<"Error in reading file");
-		everything_ok=0; // (false)
-	}
-	return everything_ok;
+    int everything_ok = 1;
+
+    if (sscanf(line, "f %d %d %d", temp, temp + 1, temp + 2) == 3) {
+        for (int i = 0; i < 3; i++)
+            iFace->SetId(i, temp[i] - 1);
+        polys->InsertNextCell(iFace);
+    } else {
+        vtkErrorMacro(<< "Error in reading file");
+        everything_ok = 0;  // (false)
+    }
+    return everything_ok;
 }
 
 int vtkSMFReader::AddColorComponent(char *line,vtkFloatArray *colorTuple)
 {
-	// this is a face definition, expect three integer, separated by whitespace:
-	float Color[3];
+    // this is a face definition, expect three integer, separated by whitespace:
+    float Color[3];
 
-	int everything_ok = 1;
+    int everything_ok = 1;
 
-	if (sscanf(line, "c %f %f %f", Color, Color + 1, Color + 2)==3) 
-	{
-		for (int i=0; i<3 ; i++)
-		{
-			if((Color[i] > 1)||(Color[i] < 0))
-			{
-				vtkErrorMacro(<<"Error in reading file");
-				everything_ok=0; // (false)
-				break;
-			}
-			else
-			{
-				colorTuple->InsertNextTuple(Color);
-			}
-		}
-	}
-	else 
-	{
-		vtkErrorMacro(<<"Error in reading file");
-		everything_ok=0; // (false)
-	}
-	
-	return everything_ok;
+    if (sscanf(line, "c %f %f %f", Color, Color + 1, Color + 2) == 3) {
+        for (int i = 0; i < 3; i++) {
+            if ((Color[i] > 1) || (Color[i] < 0)) {
+                vtkErrorMacro(<< "Error in reading file");
+                everything_ok = 0;  // (false)
+                break;
+            } else {
+                colorTuple->InsertNextTuple(Color);
+            }
+        }
+    } else {
+        vtkErrorMacro(<< "Error in reading file");
+        everything_ok = 0;  // (false)
+    }
+
+    return everything_ok;
 }
 
 int vtkSMFReader::AddTextureCoordinate(char *line, vtkFloatArray *TextureTuple)
 {
-	// this is a face definition, expect three integer, separated by whitespace:
-	float Texture[3];
-	
-	int everything_ok = 1;
+    // this is a face definition, expect three integer, separated by whitespace:
+    float Texture[3];
 
-	if (sscanf(line, "c %f %f", Texture, Texture + 1)==2) 
-	{
-		for (int i=0; i<2 ; i++)
-		{
-			if((Texture[i] > 1)||(Texture[i] < 0))
-			{
-				vtkErrorMacro(<<"Error in reading file");
-				everything_ok=0; // (false)
-				break;
-			}
-			else
-			{
-				TextureTuple->InsertNextTuple(Texture);
-			}
-		}
-	}
-	else 
-	{
-		vtkErrorMacro(<<"Error in reading file");
-		everything_ok=0; // (false)
-	}
-	return everything_ok;
+    int everything_ok = 1;
+
+    if (sscanf(line, "c %f %f", Texture, Texture + 1) == 2) {
+        for (int i = 0; i < 2; i++) {
+            if ((Texture[i] > 1) || (Texture[i] < 0)) {
+                vtkErrorMacro(<< "Error in reading file");
+                everything_ok = 0;  // (false)
+                break;
+            } else {
+                TextureTuple->InsertNextTuple(Texture);
+            }
+        }
+    } else {
+        vtkErrorMacro(<< "Error in reading file");
+        everything_ok = 0;  // (false)
+    }
+    return everything_ok;
 }
 
 int vtkSMFReader::AddNormalVector(char *line, vtkFloatArray *NormalVector)
 {
-	// this is a normal, expect three floats, separated by whitespace:
+    // this is a normal, expect three floats, separated by whitespace:
     float Normal[3];
-	
-	int everything_ok = 1;
 
-	if (sscanf(line, "n %f %f %f", Normal, Normal + 1, Normal + 2)==3) 
-    {
-		float sum = 0.0;
-		for (int i=0; i<3 ; i++)
-		{
-			sum += Normal[i] * Normal[i];
-		}
+    int everything_ok = 1;
 
-		if(sum != 1)
-		{
-			vtkErrorMacro(<<"Error in reading file");
-			everything_ok=0; // (false)
-		}
-		else
-		{
-			NormalVector->InsertNextTuple(Normal);
-		}
+    if (sscanf(line, "n %f %f %f", Normal, Normal + 1, Normal + 2) == 3) {
+        float sum = 0.0;
+        for (int i = 0; i < 3; i++) {
+            sum += Normal[i] * Normal[i];
+        }
+
+        if (sum != 1) {
+            vtkErrorMacro(<< "Error in reading file");
+            everything_ok = 0;  // (false)
+        } else {
+            NormalVector->InsertNextTuple(Normal);
+        }
+    } else {
+        vtkErrorMacro(<< "Error in reading file");
+        everything_ok = 0;  // (false)
     }
-	else 
-	{
-		vtkErrorMacro(<<"Error in reading file");
-		everything_ok=0; // (false)
-	}
 
-	return everything_ok;
+    return everything_ok;
 }
 
 
@@ -250,50 +225,39 @@ void vtkSMFReader::Execute()
   // -- work through the file line by line, assigning into the above six structures as appropriate --
   int FlagForVertex = 0;
 
+  const int MAX_LINE = 1024;
+  char line[MAX_LINE];
 
-	const int MAX_LINE=1024;
-	char line[MAX_LINE];
-	
+  while (everything_ok && fgets(line, MAX_LINE, in) != NULL) {
+      if ((strncmp(line, "bind c vertex ", 14) == 0) ||
+          (strncmp(line, "bind r vertex ", 14)) ||
+          (strncmp(line, "bind n vertex ", 14))) {
+          FlagForVertex = 1;
+      }
 
-	while (everything_ok && fgets(line,MAX_LINE,in)!=NULL) 
-    {
-		if ((strncmp(line,"bind c vertex ",14)==0) || (strncmp(line,"bind r vertex ",14)) || (strncmp(line,"bind n vertex ",14)) )
-		{
-			FlagForVertex = 1;
-		}
-	  
-		if ((strncmp(line,"bind c face ",12)==0) || (strncmp(line,"bind r face ",12)) || (strncmp(line,"bind n face ",12)) )
-		{
-			FlagForVertex = 0;
-		}
+      if ((strncmp(line, "bind c face ", 12) == 0) ||
+          (strncmp(line, "bind r face ", 12)) ||
+          (strncmp(line, "bind n face ", 12))) {
+          FlagForVertex = 0;
+      }
 
-		// in the SMF format the first characters determine how to interpret the line:
-		if (strncmp(line,"v",1)==0) 
-		{
-			everything_ok = this->AddVertex(line, points);
-		}
+      // in the SMF format the first characters determine how to interpret the
+      // line:
+      if (strncmp(line, "v", 1) == 0) {
+          everything_ok = this->AddVertex(line, points);
+      }
 
-		else if (strncmp(line,"f",1)==0)
-		{
-			everything_ok = this->AddFace(line, polys);
-		}
-		else if (strncmp(line,"r",1)==0)
-		{
-			everything_ok = this->AddTextureCoordinate(line, tcoords);
-		}
-		else if (strncmp(line,"n",1)==0)
-		{
-			everything_ok = this->AddNormalVector(line, normals);
-		}
-		else if (strncmp(line,"c",1)==0)
-		{
-			everything_ok = this->AddColorComponent(line, colorTuple);
-		}
+      else if (strncmp(line, "f", 1) == 0) {
+          everything_ok = this->AddFace(line, polys);
+      } else if (strncmp(line, "r", 1) == 0) {
+          everything_ok = this->AddTextureCoordinate(line, tcoords);
+      } else if (strncmp(line, "n", 1) == 0) {
+          everything_ok = this->AddNormalVector(line, normals);
+      } else if (strncmp(line, "c", 1) == 0) {
+          everything_ok = this->AddColorComponent(line, colorTuple);
+      }
+  }
 
-	}
-
-
-    
   // we have finished with the file
   fclose(in); 
 
@@ -311,30 +275,23 @@ void vtkSMFReader::Execute()
       // if there is an exact correspondence between tcoords and vertices then can simply
       // assign the tcoords points as point data
 
-	  if(FlagForVertex == 1)
-	  {
-		  if (tcoords->GetNumberOfTuples() == points->GetNumberOfPoints())
-		  {
-			  this->GetOutput()->GetPointData()->SetTCoords(tcoords);
-		  }
-		  if (normals->GetNumberOfTuples() == points->GetNumberOfPoints())
-		  {
-			  this->GetOutput()->GetPointData()->SetNormals(normals);
-		  }
+      if (FlagForVertex == 1) {
+          if (tcoords->GetNumberOfTuples() == points->GetNumberOfPoints()) {
+              this->GetOutput()->GetPointData()->SetTCoords(tcoords);
+          }
+          if (normals->GetNumberOfTuples() == points->GetNumberOfPoints()) {
+              this->GetOutput()->GetPointData()->SetNormals(normals);
+          }
 
-	  }
-	  else
-	  {
-		if (tcoords->GetNumberOfTuples() == polys->GetNumberOfCells())
-		  {
-			  this->GetOutput()->GetCellData()->SetTCoords(tcoords);
-		  }
-		  if (normals->GetNumberOfTuples() == polys->GetNumberOfCells())
-		  {
-			  this->GetOutput()->GetCellData()->SetNormals(normals);
-		  }
-	  }
-      
+      } else {
+          if (tcoords->GetNumberOfTuples() == polys->GetNumberOfCells()) {
+              this->GetOutput()->GetCellData()->SetTCoords(tcoords);
+          }
+          if (normals->GetNumberOfTuples() == polys->GetNumberOfCells()) {
+              this->GetOutput()->GetCellData()->SetNormals(normals);
+          }
+      }
+
       this->GetOutput()->Squeeze();
       
   }

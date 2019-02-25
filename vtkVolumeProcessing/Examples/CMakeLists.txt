@@ -1,17 +1,17 @@
 include_directories( ${ACVD_SOURCE_DIR}/VolumeProcessing )
 
 set(VolumeProcessing_EXAMPLES
-	img2raw
-	Minc2Mhd
-	png2raw
-	ReadImage
-	VolumeAnisotropicDiffusion
-	VolumeCleanLabels
-	VolumeCrop
-	VolumeMedian
-	VolumeOOCSlice
-	VolumeSlice
-	VolumeSubsample
+    img2raw
+    Minc2Mhd
+    png2raw
+    ReadImage
+    VolumeAnisotropicDiffusion
+    VolumeCleanLabels
+    VolumeCrop
+    VolumeMedian
+    VolumeOOCSlice
+    VolumeSlice
+    VolumeSubsample
 )
 
 foreach(loop_var ${VolumeProcessing_EXAMPLES})

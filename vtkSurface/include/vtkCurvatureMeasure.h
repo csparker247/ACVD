@@ -39,124 +39,134 @@
 class VTK_EXPORT vtkCurvatureMeasure : public vtkObject
 {
 public:
+    /// the public constructor
+    static vtkCurvatureMeasure* New();
 
-	/// the public constructor
-	static vtkCurvatureMeasure* New();
+    /// To define the input Mesh
+    void SetInputData(vtkSurface* Input) { this->Input = Input; };
 
-	/// To define the input Mesh
-	void SetInputData(vtkSurface *Input) {this->Input=Input;};
+    /// Returns the Input Mesh
+    vtkSurface* GetInput() { return this->Input; };
 
-	/// Returns the Input Mesh
-	vtkSurface *GetInput() {return this->Input;};
+    /// Computes the curvature measure.
+    /// The results are embedded in a vtkDataArrayCollection.
+    /// The first vtkDataArray is a double array containing the curvature
+    /// indicator The (possibly) second array is a double array containing
+    /// principal directions and curvatures
+    vtkDataArrayCollection* GetCurvatureIndicator();
 
-	/// Computes the curvature measure. 
-	/// The results are embedded in a vtkDataArrayCollection.
-	/// The first vtkDataArray is a double array containing the curvature indicator
-	/// The (possibly) second array is a double array containing principal directions and curvatures
-	vtkDataArrayCollection *GetCurvatureIndicator();
-	
-	// Returns a vtkPolyData containing the lines representing the principal directions
-	vtkPolyData *GetPrincipalDirectionsPolyData();
-	
-	
-	// Defines whether the principal directions and curvatures will be 
-	// stored in the output vtkDataArrayCollection
-	void SetComputePrincipalDirections(int S) {this->ComputeCurvatureInfoFlag=S;};
+    // Returns a vtkPolyData containing the lines representing the principal
+    // directions
+    vtkPolyData* GetPrincipalDirectionsPolyData();
 
-	// Set/ get the type of elements to compute curvature on (0 : triangles; 1 : vertices)
-	vtkSetMacro(ElementsType,int);
-	vtkGetMacro(ElementsType,int);
+    // Defines whether the principal directions and curvatures will be
+    // stored in the output vtkDataArrayCollection
+    void SetComputePrincipalDirections(int S)
+    {
+        this->ComputeCurvatureInfoFlag = S;
+    };
 
-	vtkSetMacro(ComputationMethod,int);
-	vtkGetMacro(ComputationMethod,int);
+    // Set/ get the type of elements to compute curvature on (0 : triangles; 1 :
+    // vertices)
+    vtkSetMacro(ElementsType, int);
+    vtkGetMacro(ElementsType, int);
 
-	vtkSetMacro(NeighbourhoodComputationMethod,int);
-	vtkGetMacro(NeighbourhoodComputationMethod,int);
-	
-	// defines the size of the ring used in neighbourhood computation
-	vtkSetMacro(RingSize,int);
-	vtkGetMacro(RingSize,int);
+    vtkSetMacro(ComputationMethod, int);
+    vtkGetMacro(ComputationMethod, int);
 
-	vtkSetMacro(NeighbourhoodSize,double);
-	vtkGetMacro(NeighbourhoodSize,double);
-	
-	void SetDisplay(int D) {this->Display=D;};
-	void SetNumberOfThreads(int N) {this->NumberOfThreads=N;};
+    vtkSetMacro(NeighbourhoodComputationMethod, int);
+    vtkGetMacro(NeighbourhoodComputationMethod, int);
+
+    // defines the size of the ring used in neighbourhood computation
+    vtkSetMacro(RingSize, int);
+    vtkGetMacro(RingSize, int);
+
+    vtkSetMacro(NeighbourhoodSize, double);
+    vtkGetMacro(NeighbourhoodSize, double);
+
+    void SetDisplay(int D) { this->Display = D; };
+    void SetNumberOfThreads(int N) { this->NumberOfThreads = N; };
 
 protected:
+    /// Timer for performances measures
+    vtkTimerLog* Timer;
+    double StartTime;
 
-	/// Timer for performances measures
-	vtkTimerLog *Timer;
-	double StartTime;
+    // This Mutex is used for the gathering of statistics for the curvature
+    // measure Statistics are the number of matrices with bad conditionment and
+    // the number of cells with too small neighbourhood
+    vtkSimpleCriticalSection* StatisticsLock;
+    int NumberOfBadMatrices;
+    int NumberOfCellsWithSmallNeighbourhood;
 
-	// This Mutex is used for the gathering of statistics for the curvature measure
-	// Statistics are the number of matrices with bad conditionment and the number of cells with too small neighbourhood
-	vtkSimpleCriticalSection *StatisticsLock;
-	int NumberOfBadMatrices;
-	int NumberOfCellsWithSmallNeighbourhood;
-
-	vtkCurvatureMeasure();
-	~vtkCurvatureMeasure();
+    vtkCurvatureMeasure();
+    ~vtkCurvatureMeasure();
 
 private:
+    // the type of elements to compute curvature on.
+    // 0: faces 1: vertices
+    int ElementsType;
 
-	// the type of elements to compute curvature on.
-	// 0: faces 1: vertices
-	int ElementsType;
+    // Value storing the curvature measure computation method.
+    // 0: Normal analysis. 1:Polynomial fitting
+    int ComputationMethod;
 
-	// Value storing the curvature measure computation method.
-	// 0: Normal analysis. 1:Polynomial fitting
-	int ComputationMethod;
-	
-	// Flag defining wether the curvatures info will be stored instead of the simple curvature indicator
-	int ComputeCurvatureInfoFlag;
-	
-	// Flag defining whether the principal directions will be displayed or not
-	int DisplayCurvatureInfoFlag;
+    // Flag defining wether the curvatures info will be stored instead of the
+    // simple curvature indicator
+    int ComputeCurvatureInfoFlag;
 
-	// Value storing the neighbourhood coputation for each cell.
-	// 0: Compute the n-ring.  1: Compute the neighbourhood (according to the Bounding Box Diagonal).
-	int NeighbourhoodComputationMethod;
+    // Flag defining whether the principal directions will be displayed or not
+    int DisplayCurvatureInfoFlag;
 
-	// Value storing the Ringsize when NeighbourhoodComputationMethod=0.
-	int RingSize;
+    // Value storing the neighbourhood coputation for each cell.
+    // 0: Compute the n-ring.  1: Compute the neighbourhood (according to the
+    // Bounding Box Diagonal).
+    int NeighbourhoodComputationMethod;
 
-	// Value storing the Neighbourhood size when NeighbourhoodComputationMethod=1.
-	double NeighbourhoodSize;
+    // Value storing the Ringsize when NeighbourhoodComputationMethod=0.
+    int RingSize;
 
-	// The principal directions
-	vtkFloatArray *CellsCurvatureInfo;
-	
-	// The curvature indicator :  sqrt (c1*c1+c2*c2)
-	vtkDoubleArray *CellsCurvatureIndicator;
+    // Value storing the Neighbourhood size when
+    // NeighbourhoodComputationMethod=1.
+    double NeighbourhoodSize;
 
-	// The Collection containing both Curvature indicator and principal directions	
-	vtkDataArrayCollection *CurvatureCollection;
-	
-	RenderWindow *AnchorRenderWindow;
+    // The principal directions
+    vtkFloatArray* CellsCurvatureInfo;
 
-	/// this method computes a curvature indicator having this formula : sqrt(c1*c1+c2*c2)
-	/// where c1 and c2 are the local curvature measures, computed by polynomial fitting, as explained in:
-	/// Estimating Differential Quantities using Polynomial fitting of Osculating Jets", Cazals and Pouget, 2005
-	void ComputeCurvatureIndicatorWithPolynomialFitting();
+    // The curvature indicator :  sqrt (c1*c1+c2*c2)
+    vtkDoubleArray* CellsCurvatureIndicator;
 
-	/// this method computes a curvature indicator based on the proposed solution in:
-	/// "Adaptive polygonal mesh simplification with discrete centroidal Voronoi Tesselations", Valette, Kompastsiaris, Chassery, 2005
-	void ComputeCurvatureIndicatorWithNormalAnalysis();
+    // The Collection containing both Curvature indicator and principal
+    // directions
+    vtkDataArrayCollection* CurvatureCollection;
 
-	/// The input vtkSurface;
-	vtkSurface *Input;
+    RenderWindow* AnchorRenderWindow;
 
-	// the number of threads used for the computation (used only when computing polynomial fitting)
-	// Default value is set to the number of processors
-	int NumberOfThreads;
+    /// this method computes a curvature indicator having this formula :
+    /// sqrt(c1*c1+c2*c2) where c1 and c2 are the local curvature measures,
+    /// computed by polynomial fitting, as explained in: Estimating Differential
+    /// Quantities using Polynomial fitting of Osculating Jets", Cazals and
+    /// Pouget, 2005
+    void ComputeCurvatureIndicatorWithPolynomialFitting();
 
-	// parameter defining whether the curvature indicator will be displayed or not
-	int Display;
-	
-	// the threaded method to compute the curvature
-	static VTK_THREAD_RETURN_TYPE ThreadedCurvatureComputation (void *arg);
+    /// this method computes a curvature indicator based on the proposed
+    /// solution in: "Adaptive polygonal mesh simplification with discrete
+    /// centroidal Voronoi Tesselations", Valette, Kompastsiaris, Chassery, 2005
+    void ComputeCurvatureIndicatorWithNormalAnalysis();
 
+    /// The input vtkSurface;
+    vtkSurface* Input;
+
+    // the number of threads used for the computation (used only when computing
+    // polynomial fitting) Default value is set to the number of processors
+    int NumberOfThreads;
+
+    // parameter defining whether the curvature indicator will be displayed or
+    // not
+    int Display;
+
+    // the threaded method to compute the curvature
+    static VTK_THREAD_RETURN_TYPE ThreadedCurvatureComputation(void* arg);
 };
 
 #endif

@@ -70,11 +70,11 @@ private:
   vtkSMFReader(const vtkSMFReader&);  // Not implemented.
   void operator=(const vtkSMFReader&);  // Not implemented.
 
-	int AddNormalVector(char *line, vtkFloatArray *NormalVector);
-	int AddTextureCoordinate(char *line, vtkFloatArray *TextureTuple);
-	int AddColorComponent(char *line,vtkFloatArray *colorTuple);
-	int AddFace(char *line, vtkCellArray *polys);
-	int AddVertex(char *line, vtkPoints *points);
+  int AddNormalVector(char* line, vtkFloatArray* NormalVector);
+  int AddTextureCoordinate(char* line, vtkFloatArray* TextureTuple);
+  int AddColorComponent(char* line, vtkFloatArray* colorTuple);
+  int AddFace(char* line, vtkCellArray* polys);
+  int AddVertex(char* line, vtkPoints* points);
 };
 
 #endif

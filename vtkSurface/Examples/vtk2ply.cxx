@@ -44,23 +44,22 @@ Author:   Sebastien Valette
 
 int main( int argc, char *argv[] )
 {
-	if (argc<2)
-	{
-		cout<<"Usage : vtk2ply inputmesh"<<endl;
-		exit(1);
-	}
+    if (argc < 2) {
+        cout << "Usage : vtk2ply inputmesh" << endl;
+        exit(1);
+    }
 
-	cout <<"load : "<<argv[1]<<endl;
+    cout << "load : " << argv[1] << endl;
 
-	vtkPolyDataReader *Reader=vtkPolyDataReader::New();
-	Reader->SetFileName(argv[1]);
-	Reader->Update();
+    vtkPolyDataReader* Reader = vtkPolyDataReader::New();
+    Reader->SetFileName(argv[1]);
+    Reader->Update();
 
-	// Load the mesh and create the vtkSurface data structure
-	vtkPLYWriter *Writer=vtkPLYWriter::New();
-	Writer->SetInputData(Reader->GetOutput());
-	Writer->SetFileName("mesh.ply");
-	Writer->Write();
-	cout<<"conversion to mesh.ply finished!"<<endl;
-	return (0);
+    // Load the mesh and create the vtkSurface data structure
+    vtkPLYWriter* Writer = vtkPLYWriter::New();
+    Writer->SetInputData(Reader->GetOutput());
+    Writer->SetFileName("mesh.ply");
+    Writer->Write();
+    cout << "conversion to mesh.ply finished!" << endl;
+    return (0);
 }
