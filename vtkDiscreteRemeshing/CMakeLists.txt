@@ -36,10 +36,6 @@ target_link_libraries(vtkDiscreteRemeshing
         vtkSurface
     PRIVATE
         vtkCommonCore
-        vtkInteractionStyle
-        vtkRenderingCore
-        vtkRenderingFreeType
-        vtkRenderingOpenGL2
 )
 set_target_properties(vtkDiscreteRemeshing
   PROPERTIES
@@ -57,7 +53,3 @@ install(
   ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
   PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}/ACVD/DiscreteRemeshing
 )
-
-if( BUILD_EXAMPLES )
-  add_subdirectory( Examples )
-endif()

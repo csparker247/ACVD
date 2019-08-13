@@ -34,11 +34,13 @@
 #define _VTKUNIFORMCLUSTERING_H_
 
 #include <algorithm>
-#include <vtkCommand.h>
-#include <vtkMath.h>
+#include <queue>
+#include <vtkBitArray.h>
 #include <vtkCellData.h>
+#include <vtkCommand.h>
+#include <vtkIntArray.h>
+#include <vtkMath.h>
 #include <vtkTimerLog.h>
-#include "RenderWindow.h"
 
 /// A Class to process uniform clustering, Implemented from the paper:
 /// "Approximated Centroidal Voronoi Diagrams for Uniform Polygonal Mesh Coarsening"
@@ -82,16 +84,6 @@ public:
 	
 	// Sets On/Off the fast initialization by unconstrained clustering (default : Off)
 	void SetConstrainedInitialization(int C) {this->UnconstrainedInitializationFlag=C;};
-			
-	/// Enables/Disables graphical display
-	/// 0: no display  1: display after convergence   2: display during convergence (might be slow)
-	/// 3: display during clustering and capture images
-	/// default:1
-	void SetDisplay(int d){this->Display=d;};
-	
-	/// Sets the Anchor Renderwindow of the class
-	/// this is usefull when several windows have to be linked outside this class
-	void SetAnchorRenderWindow(RenderWindow *Window) {this->AnchorRenderWindow=Window;};
 	
 	/// Enables/Disables console output (text mode)  while processing
 	/// 0: off  1:on  Default:0
@@ -121,12 +113,6 @@ public:
 
 	/// Returns a pointer to a given cluster
 	typename Metric::Cluster *GetCluster(int C) {return (this->Clusters+C);};
-	
-	/// Sets On/Off the writing of the energy evolution during the clustering to a file called "energy.txt"
-	void SetWriteToGlobalEnergyLog(int S) {this->ComputeAndSaveEnergy=S;};
-	
-	/// Defines the output directory where thr log file will be written
-	void SetOutputDirectory(char *S) {this->OutputDirectory=S;};
 
 	/// Pure virtual method to be implemented in derived classes
 	virtual int GetNumberOfItems()=0;
@@ -164,15 +150,6 @@ protected:
 	/// Pure virtual method to be implemented in derived classes
 	virtual void GetItemCoordinates(vtkIdType Item,double *P)=0;
 
-	/// displays the clustering in the RenderWindow, possibly captures the images depending on Display options
-	virtual void Snapshot()=0;
-
-	/// method to create the render window(s)
-	virtual void CreateWindows()=0;
-	
-	/// method to enable window interaction
-	virtual void InteractWithClusteringWindow(){};
-
 	/// Method to build the metric (pure virtual function)
 	virtual void BuildMetric()=0;
 	
@@ -186,9 +163,6 @@ protected:
 
 	/// The clusters, metric-dependent
 	typename Metric::Cluster *Clusters;
-
-	/// the Anchor render window used to link all the windows
-	RenderWindow *AnchorRenderWindow;
 
 	/// the constructor
 	vtkUniformClustering(); 
@@ -204,10 +178,6 @@ protected:
 	
 	/// Possibly points to a user-defined initial clustering when one was defined by SetInitialClustering()
 	vtkIntArray *InitialClustering;
-
-	/// Parameter to enable Graphical Display of the clustering 
-	/// 0: no display  1: display after convergence   2: display during convergence (might be slow)
-	int Display;
 	
 	/// initialize the arrays (accumulators etc)
 	virtual void Init();
@@ -305,9 +275,6 @@ protected:
 	/// the number of times convergence was reached
 	int NumberOfConvergences;
 
-	/// the frame number when Display=3
-	int FrameNumber;
-
 	/// Timer for speed measures
 	vtkTimerLog *Timer;
 
@@ -316,22 +283,6 @@ protected:
 
 	/// returns the global energy value, also computes the difference between last time it was computed
 	long double ComputeGlobalEnergy();
-
-	/// method to enable/disable the writing of a file containing the energy values during clustering
-	void SetComputeAndSaveEnergy(int S) {this->ComputeAndSaveEnergy=S;};
-
-	/// the flag defining whether or not the energy value is stored to a file
-	int ComputeAndSaveEnergy;
-
-	/// small method to write current time and energy value to the file
-	void WriteToGlobalEnergyLog();
-
-	/// the text file where the global energy evolution is written.
-	// the 4 columns are : loop number , time, energy, energy difference;
-	std::ofstream GlobalEnergyLog;
-
-	// the optionnal output directory (usefull when using the batch manager)
-	char* OutputDirectory;
 
 	// this flag determines whether the clustering will be performed first with unconstrained metric and then with constrained metric (this makes the clustering faster)
 	int UnconstrainedInitializationFlag;
@@ -691,21 +642,6 @@ vtkIntArray* vtkUniformClustering<Metric,EdgeType>::ProcessClustering(vtkIdList 
 
 	this->Init();
 	this->InitSamples(List);
-	
-	char FileName[1000];
-	if (this->OutputDirectory)
-	{
-		strcpy(FileName,this->OutputDirectory);
-		strcat(FileName,"energy.txt");
-	}
-	else
-		strcpy(FileName,"energy.txt");
-		
-	
-	if (this->ComputeAndSaveEnergy)
-		this->GlobalEnergyLog.open (FileName, ofstream::out | ofstream::trunc);
-
-	this->CreateWindows();
 
 	if (this->ConsoleOutput)
 		cout<<"Clustering......"<<endl;
@@ -722,13 +658,6 @@ vtkIntArray* vtkUniformClustering<Metric,EdgeType>::ProcessClustering(vtkIdList 
 	this->NumberOfConvergences=0;
 	this->MinimizeEnergy();
 	Timer->StopTimer();
-	
-	if (this->ComputeAndSaveEnergy)
-	{
-		this->ReComputeStatistics();
-		GlobalEnergyLog<<"Final Energy :"<<setprecision(15)<<this->ComputeGlobalEnergy()<<endl;		
-		this->GlobalEnergyLog.close();
-	}
 
 	if (this->ConsoleOutput!=0)
 	{
@@ -737,7 +666,6 @@ vtkIntArray* vtkUniformClustering<Metric,EdgeType>::ProcessClustering(vtkIdList 
 	}
 
 	Timer->Delete();
-	this->Snapshot();
 	return (this->Clustering);
 }
 
@@ -766,13 +694,6 @@ void vtkUniformClustering<Metric,EdgeType>::MinimizeEnergy()
 		this->SwapQueues();
 		NumberOfModifications=this->ProcessOneLoop();
 		Timer->StopTimer();
-
-		// Display the clustering if wanted
-		if (this->Display>1)
-			this->Snapshot();
-
-		// Write Energy value and computing times to file if wanted
-		this->WriteToGlobalEnergyLog();
 		
 		if (this->ConsoleOutput>1)
 		{
@@ -1402,18 +1323,6 @@ void vtkUniformClustering<Metric,EdgeType>::Init()
 }
 
 template <class Metric, class EdgeType>
-void vtkUniformClustering<Metric,EdgeType>::WriteToGlobalEnergyLog()
-{
-	if (this->ComputeAndSaveEnergy)
-	{
-		double Time;
-		Time=Timer->GetUniversalTime();
-		GlobalEnergyLog<<this->NumberOfLoops<<" "<<Time-this->StartTime
-		<<" "<<setprecision(15)<<this->ComputeGlobalEnergy()<<setprecision(6)<<endl;
-	}
-}
-
-template <class Metric, class EdgeType>
 vtkUniformClustering<Metric,EdgeType>::vtkUniformClustering()
 {
 	this->Clustering=0;
@@ -1421,7 +1330,6 @@ vtkUniformClustering<Metric,EdgeType>::vtkUniformClustering()
 	this->ClustersSizes=0;
 	this->EdgesLastLoop=0;
 	this->ClustersLastModification=0;
-	this->Display=0;
 	this->ConsoleOutput=0;
 	this->MaxNumberOfConvergences=1000000000;
 	this->MaxNumberOfLoops=5000000;
@@ -1430,8 +1338,6 @@ vtkUniformClustering<Metric,EdgeType>::vtkUniformClustering()
 	this->SpareFactor=0;
 	this->InitialSamplingType=1;
 	this->ConnexityConstraint=0;
-	this->ComputeAndSaveEnergy=0;
-	this->OutputDirectory=0;
 	this->Clusters=0;
 	this->UnconstrainedInitializationFlag=0;
 	this->EdgeList=vtkIdList::New();

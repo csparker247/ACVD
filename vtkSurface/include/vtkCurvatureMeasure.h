@@ -35,7 +35,7 @@
 #include <vtkFloatArray.h>
 #include <vtkCriticalSection.h>
 #include "vtkSurface.h"
-#include "RenderWindow.h"
+
 class VTK_EXPORT vtkCurvatureMeasure : public vtkObject
 {
 public:
@@ -79,9 +79,8 @@ public:
 
 	vtkSetMacro(NeighbourhoodSize,double);
 	vtkGetMacro(NeighbourhoodSize,double);
-	
-	void SetDisplay(int D) {this->Display=D;};
-	void SetNumberOfThreads(int N) {this->NumberOfThreads=N;};
+
+    void SetNumberOfThreads(int N) { this->NumberOfThreads = N; };
 
 protected:
 
@@ -132,8 +131,6 @@ private:
 
 	// The Collection containing both Curvature indicator and principal directions	
 	vtkDataArrayCollection *CurvatureCollection;
-	
-	RenderWindow *AnchorRenderWindow;
 
 	/// this method computes a curvature indicator having this formula : sqrt(c1*c1+c2*c2)
 	/// where c1 and c2 are the local curvature measures, computed by polynomial fitting, as explained in:
@@ -150,9 +147,6 @@ private:
 	// the number of threads used for the computation (used only when computing polynomial fitting)
 	// Default value is set to the number of processors
 	int NumberOfThreads;
-
-	// parameter defining whether the curvature indicator will be displayed or not
-	int Display;
 	
 	// the threaded method to compute the curvature
 	static VTK_THREAD_RETURN_TYPE ThreadedCurvatureComputation (void *arg);

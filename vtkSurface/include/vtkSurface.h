@@ -42,8 +42,6 @@
 #include <vtkEdgeTable.h>
 #include <vtkCommand.h>
 #include <vtkIdListCollection.h>
-#include <vtkPolyDataWriter.h>
-#include <vtkPLYWriter.h>
 #include "vtkSurfaceBase.h"
 
 
@@ -154,14 +152,6 @@ public:
    /// Computes the histogram of triangles quality and writes it in a file
    void ComputeQualityHistogram(const char *FileName);
 
-   /// Creates the vtkSurface object by reading a mesh file.
-   /// Supported file types : .wrl, .vtk and .ply
-   void CreateFromFile (const char *FileName);
-
-   /// Saves the mesh
-   /// Supported file types : .vtk and .ply
-   void WriteToFile (const char *FileName);
-
    /// The Constructor vtkSurface::New();
    static vtkSurface *New();
 
@@ -182,13 +172,6 @@ public:
      /// Quantizes the coordinates of the mesh to integers
    /// (quantization parameters must be given
    void QuantizeCoordinates(double Factor, double Tx, double Ty, double Tz);
-
-
-   /// Writes the mesh to a .iv file
-   void WriteInventor(const char *filename);
-
-   /// Writes the mesh to a .smf file
-   void WriteSMF(const char *filename);
 
    /// Computes the list of sharp vertices
    void ComputeSharpVertices(double treshold);
@@ -237,9 +220,6 @@ public:
 	void PrintVerticesCoordinates();
 	void PrintConnectivity();
 	void SaveConnectivity(const char * FileName);
-
-    void WriteMeshStatisticsFile( const char* AreaFileName, const char* QFileName,
-                             const char* AngleMinFileName, const char* DegreeFileName );
 
 protected:
 

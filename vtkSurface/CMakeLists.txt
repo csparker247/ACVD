@@ -5,14 +5,9 @@
 file(GLOB _vtkSurface_hdrs include/*.h)
 
 add_library(vtkSurface
-  src/RenderWindow.cxx
   src/vtkDelaunay.cxx
-  src/vtkDualMeshDisplay.cxx
-  src/vtkOFFReader.cxx
-  src/vtkOFFWriter.cxx
   src/vtkQuadricTools.cxx
   src/vtkRandomTriangulation.cxx
-  src/vtkSMFReader.cxx
   src/vtkSurface.cxx
   src/vtkSurfaceBase.cxx
   src/vtkVolumeProperties.cxx
@@ -28,22 +23,6 @@ target_include_directories(vtkSurface
 target_link_libraries(vtkSurface
     PRIVATE
         vtkCommonCore
-        vtkFiltersHybrid
-        vtkIOExport
-        vtkIOExportOpenGL2
-        vtkIOExportPDF
-        vtkIOGeometry
-        vtkIOImport
-        vtkIOLegacy
-        vtkIOMINC
-        vtkIOPLY
-        vtkInteractionStyle
-        vtkRenderingCore
-        vtkRenderingFreeType
-        vtkRenderingLabel
-        vtkRenderingOpenGL2
-        vtkRenderingContextOpenGL2
-        vtkViewsContext2D
 )
 
 set_target_properties(vtkSurface
@@ -62,7 +41,3 @@ install(
   ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
   PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}/ACVD/Common
 )
-
-if( BUILD_EXAMPLES )
-  add_subdirectory( Examples )
-endif()

@@ -35,28 +35,10 @@ void vtkManifoldSimplification::Simplify()
 			CurrentNumberOfPoints--;
 	}
 
-	if (this->Display)
-	{
-		this->Window=RenderWindow::New();
-		this->Window->SetInputData(this->Input);
-		this->Window->SetWindowName("Simplification");	
-	}
-
 	// iteratively collapse the edges
 	while ((this->EdgesQueue->GetNumberOfItems()!=0)
 		&&(CurrentNumberOfPoints>this->NumberOfOutputVertices))
 	{
-		if ((this->Display!=0)&&(CurrentNumberOfPoints==NextNumberOfPoints))
-		{
-			this->Input->DisplayMeshProperties();
-			if (this->Window->GetEdgesActor())
-				Window->DisplayInputEdges();
-			this->Window->Render();
-			this->Window->Interact();
-//			NextNumberOfPoints-=10;
-			NextNumberOfPoints=(NextNumberOfPoints*7)/10;
-		}
-
 		double Priority;
 		vtkIdType Edge=this->EdgesQueue->Pop(0,Priority);
 		int Direction=Edge & 1;
@@ -190,16 +172,6 @@ void vtkManifoldSimplification::Simplify()
 		}
 	}
 	
-	if (this->Display!=0)
-	{
-		this->Input->DisplayMeshProperties();
-		this->Window->SetWindowName("Final Simplification");
-		if (this->Window->GetEdgesActor())
-			Window->DisplayInputEdges();
-		this->Window->Render();
-		this->Window->Interact();
-	}
-	
 	Neighbours1->Delete();
 	Neighbours2->Delete();
 	EdgesToUpdate->Delete();
@@ -279,7 +251,6 @@ vtkStandardNewMacro(vtkManifoldSimplification);
 vtkManifoldSimplification::vtkManifoldSimplification()
 {
 	this->Input=0;
-	this->Display=0;
 	this->NumberOfOutputVertices=100;
 	this->EdgesQueue=vtkPriorityQueue::New();
 	this->NonContractibleEdges=vtkBitArray::New();
