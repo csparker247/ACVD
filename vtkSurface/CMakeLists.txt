@@ -21,10 +21,11 @@ target_include_directories(vtkSurface
       $<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}/ACVD/Common>
 )
 target_link_libraries(vtkSurface
+    PUBLIC
+        vtkCommonSystem
     PRIVATE
         vtkCommonCore
         vtkCommonDataModel
-        vtkCommonSystem
         vtkFiltersCore
 )
 
