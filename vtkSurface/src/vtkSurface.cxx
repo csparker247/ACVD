@@ -25,12 +25,6 @@
 #include <vtkObjectFactory.h>
 #include <vtkMath.h>
 #include <vtkDoubleArray.h>
-#include <vtkVRMLImporter.h>
-#include <vtkPLYReader.h>
-#include <vtkPolyDataReader.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRendererCollection.h>
 #include <vtkCellData.h>
 #include <vtkTriangle.h>
 #include <vtkCleanPolyData.h>
@@ -38,21 +32,9 @@
 #include <vtkUnstructuredGrid.h>
 #include <vtkPriorityQueue.h>
 #include <vtkEdgeTable.h>
-#include <vtkOBJReader.h>
-#include <vtkSTLReader.h>
-#include <vtkMeshQuality.h>
 
 #include "vtkSurface.h"
-#include "vtkOFFReader.h"
-#include "vtkSMFReader.h"
 #include "vtkVolumeProperties.h"
-
-// this variable allows the creation of render windows when cleaning a mesh.
-//#define DISPLAYMESHCLEANING
-
-#ifdef DISPLAYMESHCLEANING
-#include "RenderWindow.h"
-#endif
 
 vtkSurface *vtkSurface::GetBiggestConnectedComponent()
 {
@@ -213,62 +195,6 @@ double TriangleMinAngle( vtkCell* cell )
   alpha = alpha < beta ? alpha : beta;
 
   return  (alpha < gamma ? alpha : gamma) * 180. * normal_coeff;
-}
-
-void vtkSurface::WriteMeshStatisticsFile( const char* AreaFileName, const char* QFileName,
-                              const char* AngleMinFileName, const char* DegreeFileName )
-{
-    std::ofstream area_file( AreaFileName );
-    std::ofstream Q_file( QFileName );
-    std::ofstream AngleMin_file( AngleMinFileName );
-    std::ofstream Degree_file( DegreeFileName );
-
-    double coeff = (12.0/sqrt(3.0));
-    vtkIdType v1, v2, v3;
-    double FP1[3], FP2[3], FP3[3];
-    double length = 0.;
-    double perimeter = 0.;
-    double area = 0.;
-    double lmax = 0.;
-
-    for( vtkIdType i = 0; i < this->GetNumberOfCells( ); i++ )
-    {
-        this->GetFaceVertices(i,v1,v2,v3);
-        this->GetPoints()->GetPoint(v1,FP1);
-        this->GetPoints()->GetPoint(v2,FP2);
-        this->GetPoints()->GetPoint(v3,FP3);
-
-        length=sqrt(vtkMath::Distance2BetweenPoints(FP1,FP2));
-        lmax=length;
-        perimeter=length;
-
-        length=sqrt(vtkMath::Distance2BetweenPoints(FP2,FP3));
-
-        if( lmax < length )
-            lmax=length;
-        perimeter+=length;
-
-        length=sqrt(vtkMath::Distance2BetweenPoints(FP1,FP3));
-        if( lmax < length)
-            lmax=length;
-        perimeter+=length;
-        area=vtkTriangle::TriangleArea(FP1,FP2,FP3);
-
-        area_file <<area <<std::endl;
-
-        Q_file <<coeff*area/(perimeter*lmax) <<std::endl;
-
-        vtkCell *Cell=this->GetCell(i);
-        AngleMin_file <<TriangleMinAngle(Cell) <<std::endl;
-    }
-
-    for( vtkIdType i = 0; i < this->GetNumberOfPoints( ); i++ )
-        Degree_file <<this->GetValence(i) <<std::endl;
-
-    area_file.close( );
-    Q_file.close( );
-    Q_file.close( );
-    Degree_file.close( );
 }
 
 void vtkSurface::GetVertexNormal(vtkIdType Vertex, double *Normal)
@@ -1504,84 +1430,6 @@ vtkPolyData * vtkSurface::GetVerticesPolyData()
 	return (Vertices);
 }
 
-
-void vtkSurface::WriteInventor(const char *filename)
-{
-
-	std::ofstream File;
-	File.open (filename, ofstream::out | ofstream::trunc);
-	vtkIdType i, v1, v2, v3;
-	double P[3];
-
-	vtkPoints *points = this->GetPoints();
-
-	File<<"#Inventor V2.1 ascii"<<endl;
-	File<<"Separator {"<<endl;
-
-	// * write out the coordinates *
-
-	File<<"Coordinate3 {"<<endl;
-	File<<"  point ["<<endl;
-
-	for (i = 0; i < this->GetNumberOfPoints(); i++)
-	{
-		points->GetPoint(i,P);
-		File<<P[0]<<" "<<P[1]<<" "<<P[2]<<endl;
-	}
-
-	File<<"]"<<endl;
-	File<<"}"<<endl<<endl;
-
-	// * write the faces *
-
-	File<<"IndexedFaceSet {"<<endl;
-	File<<"  coordIndex ["<<endl;
-
-	for (i = 0; i <this->GetNumberOfCells();i++)
-	{
-		File<<"   ";
-		this->GetFaceVertices(i,v1,v2,v3);
-		File<<v1<<" "<<v2<<" "<<v3<<" -1"<<endl;
-	}
-	File<<"]"<<endl;
-	File<<"}"<<endl<<endl;
-
-	// * end separator *
-	File<<"}"<<endl<<endl;
-
-	File.close();
-}
-void vtkSurface::WriteSMF(const char *filename)
-{
-	std::ofstream File;
-	File.open (filename, ofstream::out | ofstream::trunc);
-
-	vtkIdType i;
-	vtkIdType nverts=this->GetNumberOfPoints();
-	vtkIdType nfaces=this->GetNumberOfCells();
-
-	File << "# Generated from PLY data by ply2smf" << endl;
-	File<< "# " <<  nverts<< " vertices" << endl;
-	File << "# " << nfaces << " faces" << endl;
-
-	double P[3];
-	for(i=0; i<nverts; i++)
-	{
-		this->GetPoint(i,P);
-		File << "v "<< P[0] << " " << P[1] << " " << P[2] << endl;
-	}
-
-	vtkIdType v1,v2,v3;
-	for(i=0; i<nfaces; i++)
-	{
-		this->GetFaceVertices(i,v1,v2,v3);
-
-		File << "f "<< v1+1 << " "<< v2+1 << " "<< v3+1 << endl;
-	}
-	File.close();
-}
-
-
 // ****************************************************************
 // ****************************************************************
 void vtkSurface::ComputeSharpVertices(double treshold)
@@ -1875,167 +1723,6 @@ void vtkSurface::QuantizeCoordinates(double Factor, double Tx, double Ty, double
 		p[1] = floor( (p[1]-Ty) * Factor + 0.5 );
 		p[2] = floor( (p[2]-Tz) * Factor + 0.5 );
 		this->Points->SetPoint(i,p);
-	}
-}
-
-void vtkSurface::WriteToFile (const char *FileName)
-{
-	char filename[500];
-
-	strcpy(filename,FileName);
-	if (filename != NULL) {
-		char *p;
-		for (p = filename; *p; ++p)
-			*p = tolower(*p);
-	}
-
-	if (strstr(filename,".vtk") != NULL) {
-		vtkPolyDataWriter *Writer = vtkPolyDataWriter::New();
-		Writer->SetInputData(this);
-		Writer->SetFileName(FileName);
-		Writer->Write();
-	}
-
-	if (strstr(filename,".ply") != NULL) {
-		vtkPLYWriter *Writer = vtkPLYWriter::New();
-		Writer->SetInputData(this);
-		Writer->SetFileName(FileName);
-		Writer->Write();
-	}
-}
-
-// ****************************************************************
-// ****************************************************************
-void vtkSurface::CreateFromFile(const char *FileName)
-{
-
-	int ch;
-	char *terminaison;
-	char fin[180];
-	char filename[180];
-
-	strcpy(filename,FileName);
-
-	if (filename != NULL)
-	{
-		char *p;
-
-		for (p = filename; *p; ++p)
-			*p = tolower(*p);
-	}
-
-
-	ch='.';
-	strcpy (fin,".vtk");
-	terminaison = strstr(filename,fin);
-	if (terminaison!=NULL)
-	{
-		vtkPolyDataReader *Reader = vtkPolyDataReader::New();
-		Reader->SetFileName(FileName);
-		Reader->Update();
-		this->CreateFromPolyData(Reader->GetOutput());
-		Reader->Delete();
-		return;
-	}
-
-	ch='.';
-	strcpy (fin,".vtp");
-	terminaison = strstr(filename,fin);
-	if (terminaison!=NULL)
-	{
-		vtkPolyDataReader *Reader = vtkPolyDataReader::New();
-		Reader->SetFileName(FileName);
-		Reader->Update();
-		this->CreateFromPolyData(Reader->GetOutput());
-		Reader->Delete();
-		return;
-	}
-
-	ch='.';
-	strcpy (fin,".ply");
-	terminaison = strstr(filename,fin);
-	if (terminaison!=NULL)
-	{
-		vtkPLYReader *Reader = vtkPLYReader::New();
-		Reader->SetFileName(FileName);
-		Reader->Update();
-		this->CreateFromPolyData(Reader->GetOutput());
-		Reader->Delete();
-		return;
-	}
-
-	ch='.';
-	strcpy (fin,".wrl");
-	terminaison=strstr(filename,fin);
-	if (terminaison!=NULL)
-	{
-		cout<<"wrl"<<endl;
-
-		vtkRenderer *vrmlrenderer1=vtkRenderer::New();
-		vtkRenderWindow *vrmlrenWin=vtkRenderWindow::New();
-		vrmlrenWin->AddRenderer(vrmlrenderer1);
-		vtkVRMLImporter *importer=vtkVRMLImporter::New();
-		importer->SetRenderWindow(vrmlrenWin);
-		importer->SetFileName(FileName);
-		importer->Read();
-		vtkRendererCollection *renCollection=vrmlrenWin->GetRenderers();
-		renCollection->InitTraversal();
-		vtkRenderer *ren=renCollection->GetNextItem();
-		vtkPolyData *temporary=(vtkPolyData*) ren->GetActors()->GetLastActor()->GetMapper()->GetInput();
-		this->CreateFromPolyData(temporary);
-		vrmlrenWin->Delete();
-		vrmlrenderer1->Delete();
-		importer->Delete();
-	}
-	ch='.';
-	strcpy (fin,".off");
-	terminaison = strstr(filename,fin);
-	if (terminaison!=NULL)
-	{
-		vtkOFFReader *Reader = vtkOFFReader::New();
-		Reader->SetFileName(FileName);
-//		Reader->SetInfoOnCellsOn();
-		Reader->Update();
-		this->CreateFromPolyData(Reader->GetOutput());
-		Reader->Delete();
-		return;
-	}
-	ch='.';
-	strcpy (fin,".obj");
-	terminaison = strstr(filename,fin);
-	if (terminaison!=NULL)
-	{
-		vtkOBJReader *Reader = vtkOBJReader::New();
-		Reader->SetFileName(FileName);
-		Reader->Update();
-		this->CreateFromPolyData(Reader->GetOutput());
-		Reader->Delete();
-		return;
-	}
-	ch='.';
-	strcpy (fin,".stl");
-	terminaison = strstr(filename,fin);
-	if (terminaison!=NULL)
-	{
-		vtkSTLReader *Reader = vtkSTLReader::New();
-		Reader->SetFileName(FileName);
-		Reader->Update();
-		this->CreateFromPolyData(Reader->GetOutput());
-		Reader->Delete();
-		return;
-	}
-
-	ch='.';
-	strcpy (fin,".smf");
-	terminaison = strstr(filename,fin);
-	if (terminaison!=NULL)
-	{
-		vtkSMFReader *Reader = vtkSMFReader::New();
-		Reader->SetFileName(FileName);
-		Reader->Update();
-		this->CreateFromPolyData(Reader->GetOutput());
-		Reader->Delete();
-		return;
 	}
 }
 

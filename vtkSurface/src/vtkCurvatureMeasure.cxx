@@ -37,8 +37,6 @@ email                :
 #include "vtkCurvatureMeasure.h"
 #include "vtkNeighbourhoodComputation.h"
 
-#define DISPLAYINTERVAL 10000
-
 /// this class is made to compute curvature measure of a vtkIdList with polynomial fitting
 /// It was created to ease mumtithreading
 class vtkSinglePolynomialMeasure:public vtkObject
@@ -685,22 +683,6 @@ vtkCurvatureMeasure::ThreadedCurvatureComputation (void *arg)
 		else
 			CurvatureMeasure->CellsCurvatureIndicator->SetValue (Cell,Measure->ComputeFitting(FList));
 
-
-		if ((Cell % DISPLAYINTERVAL == 0) && (Cell != 0))
-		{
-			char CarriageReturn = 13;
-#if ( (VTK_MAJOR_VERSION >= 5))
-			ElapsedTime =CurvatureMeasure->Timer->GetUniversalTime () -StartTime;
-#else
-			ElapsedTime =CurvatureMeasure->Timer->GetCurrentTime () - StartTime;
-#endif
-			TotalTimeEstimated =ElapsedTime * NumberOfCells / Cell;
-			cout << CarriageReturn << (int) (TotalTimeEstimated -ElapsedTime) <<
-				" s remaining." << " Total time: " << (int)
-				TotalTimeEstimated << " s. " << Cell /
-				ElapsedTime << " Cells/second          " <<
-				std::flush;
-		}
 	}
 	CurvatureMeasure->StatisticsLock->Lock ();
 	CurvatureMeasure->NumberOfBadMatrices += Measure->NumberOfBadMatrices;
@@ -759,70 +741,6 @@ vtkCurvatureMeasure::GetCurvatureIndicator ()
 	cout << "The curvature indicator calculation took :" << Timer->
 		GetElapsedTime () << " seconds." << endl;
 	Timer->Delete ();
-
-	if (this->Display)
-	{
-		vtkDoubleArray *IndicatorColors = vtkDoubleArray::New ();
-		IndicatorColors->SetNumberOfValues (NumberOfElements);
-		double MaxIndicatorColor = 0;
-		double MeanIndicator = 0;
-
-		for (i = 0; i < NumberOfElements; i++)
-		{
-			IndicatorColors->SetValue (i,CellsCurvatureIndicator->GetValue (i));
-			if (MaxIndicatorColor < IndicatorColors->GetValue (i))
-				MaxIndicatorColor =	IndicatorColors->GetValue (i);
-			MeanIndicator += IndicatorColors->GetValue (i);
-		}
-		MeanIndicator /= NumberOfElements;
-		double ClampingFactor = 100.0;
-		if (MaxIndicatorColor > ClampingFactor * MeanIndicator)
-			MaxIndicatorColor = ClampingFactor * MeanIndicator;
-		for (i = 0; i < NumberOfElements; i++)
-		{
-			if (IndicatorColors->GetValue (i) > MaxIndicatorColor)
-				IndicatorColors->SetValue (i,MaxIndicatorColor);
-			IndicatorColors->SetValue (i,IndicatorColors->GetValue(i)/MaxIndicatorColor);
-		}
-
-		RenderWindow *Window;
-		vtkPolyData *Mesh2 = vtkPolyData::New ();
-		Window = RenderWindow::New ();
-
-		Mesh2->ShallowCopy (this->Input);
-		if (this->ElementsType == 0)
-		{
-			Mesh2->GetCellData ()->SetScalars (IndicatorColors);
-			Mesh2->GetPointData ()->SetScalars (0);
-		}
-		else
-		{
-			Mesh2->GetPointData ()->SetScalars (IndicatorColors);
-			Mesh2->GetCellData ()->SetScalars (0);
-		}
-
-		Window->SetInputData (Mesh2);
-
-		vtkLookupTable *bwLut = vtkLookupTable::New ();
-		bwLut->SetTableRange (0, 1);
-
-		bwLut->SetSaturationRange (0, 0);	// Black     and     white
-		bwLut->SetHueRange (0, 0);
-		bwLut->SetValueRange (0, 1);
-		bwLut->SetScaleToLog10 ();
-		bwLut->Build ();
-		Window->SetLookupTable (bwLut);
-
-		Window->Render ();
-		Window->SetWindowName ("Curvature Measure");
-		if (this->AnchorRenderWindow)
-			Window->AttachToRenderWindow (AnchorRenderWindow);
-		else
-			this->AnchorRenderWindow = Window;
-		Window->Interact ();
-
-		bwLut->Delete ();
-	}
 
 	this->CurvatureCollection = vtkDataArrayCollection::New ();
 	this->CurvatureCollection->AddItem (this->CellsCurvatureIndicator);
@@ -1171,13 +1089,11 @@ vtkCurvatureMeasure::New ()
 vtkCurvatureMeasure::vtkCurvatureMeasure ()
 {
 	this->CellsCurvatureIndicator = 0;
-	this->AnchorRenderWindow = 0;
 	this->ComputationMethod = 1;
 	this->NeighbourhoodComputationMethod = 0;
 	this->RingSize = 3;
 	this->NeighbourhoodSize = 0.01;
 	this->NumberOfThreads = 0;
-	this->Display = 0;
 
 	this->ElementsType = 0;
 

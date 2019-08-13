@@ -12,7 +12,6 @@
 #define __vtkManifoldSimplification_h
 
 #include "vtkSurface.h"
-#include "RenderWindow.h"
 #include "vtkPriorityQueue.h"
 
 class VTK_EXPORT vtkManifoldSimplification : public vtkObject
@@ -29,9 +28,6 @@ public:
 	// Simplify the input mesh
 	void Simplify();
 
-	// Enable/Disable graphical display
-	vtkSetMacro(Display, int)
-
 	// Set the number of desired vertices
 	vtkSetMacro(NumberOfOutputVertices, int)
 
@@ -40,8 +36,6 @@ protected:
 	void AllocateMemory();
 	void ReleaseMemory();
 	void UpdateEdgePriority(vtkIdType Edge);
-
-	RenderWindow *Window;
 
 	// input mesh
 	vtkSurface *Input;
@@ -64,8 +58,6 @@ protected:
 	
 	double *QuadricsArray;
 	double **Quadrics;
-
-	int Display;
 };
 
 

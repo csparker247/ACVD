@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(ACVD VERSION 1.0.1)
+project(ACVD VERSION 1.1.0)
 
-set(ACVD_LIB_SOVERSION ${ACVD_MAJOR_VERSION}.${ACVD_MINOR_VERSION} )
+set(ACVD_LIB_SOVERSION ${ACVD_VERSION_MAJOR}.${ACVD_VERSION_MINOR})
 
 # Build Env Options
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
@@ -18,7 +18,7 @@ set(INSTALL_CMAKE_DIR lib/cmake/ACVD CACHE PATH "Installation directory for CMak
 option(BUILD_DOCUMENTATION "Build the html documentation with doxygen." OFF)
 option(BUILD_DISCRETEREMESHING "Build Discrete Remeshing Tools." ON)
 option(BUILD_VOLUMEPROCESSING "Build Volume tools" ON)
-option(BUILD_EXAMPLES "Build examples" ON)
+option(BUILD_EXAMPLES "Build examples" OFF)
 
 # App manifest
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ACVD.json ${EXECUTABLE_OUTPUT_PATH}/ACVD.json COPYONLY)
@@ -73,4 +73,3 @@ install(
     NAMESPACE "ACVD::"
     DESTINATION ${INSTALL_CMAKE_DIR}
 )
-

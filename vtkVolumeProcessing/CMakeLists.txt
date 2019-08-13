@@ -12,6 +12,14 @@ target_include_directories(vtkVolumeProcessing
       $<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}/ACVD/VolumeProcessing>
 )
 
+target_link_libraries(vtkVolumeProcessing
+    PRIVATE
+        vtkCommonCore
+        vtkCommonExecutionModel
+        vtkIOImage
+        vtkmetaio
+)
+
 set_target_properties(vtkVolumeProcessing
   PROPERTIES
     DEBUG_POSTFIX "-d"
@@ -28,7 +36,3 @@ install(
   ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
   PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}/ACVD/VolumeProcessing
 )
-
-if( BUILD_EXAMPLES )
-  add_subdirectory( Examples )
-endif()

@@ -34,6 +34,8 @@ target_include_directories(vtkDiscreteRemeshing
 target_link_libraries(vtkDiscreteRemeshing
     PUBLIC
         vtkSurface
+    PRIVATE
+        vtkCommonCore
 )
 set_target_properties(vtkDiscreteRemeshing
   PROPERTIES
@@ -51,7 +53,3 @@ install(
   ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
   PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}/ACVD/DiscreteRemeshing
 )
-
-if( BUILD_EXAMPLES )
-  add_subdirectory( Examples )
-endif()

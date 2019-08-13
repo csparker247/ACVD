@@ -34,13 +34,8 @@
 #include <vtkObjectFactory.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
-#include <vtkPLYWriter.h>
-#include <vtkMetaImageReader.h>
-#include <vtkMINCImageReader.h>
-#include <vtkImageData.h>
 
 #include "vtkSurface.h"
-#include "RenderWindow.h"
 #include "vtkSurfaceClustering.h"
 #include "vtkCurvatureMeasure.h"
 #include "vtkTag.h"
@@ -49,7 +44,8 @@
 // This class adds meshing features to the clustering class, as proposed in : 
 // " Approximated Centroidal Voronoi Diagrams for Uniform Polygonal Mesh Coarsening", Valette & Chassery, Eurographics 2004
 
-template < class Metric > class vtkDiscreteRemeshing:public vtkSurfaceClustering <Metric >
+template <class Metric>
+class vtkDiscreteRemeshing : public vtkSurfaceClustering<Metric>
 
 {
     public:
@@ -62,12 +58,6 @@ template < class Metric > class vtkDiscreteRemeshing:public vtkSurfaceClustering
 
 	// process the remeshing
 	virtual void Remesh ();
-
-	/// for debugging: sets on/off the capability to skip the curvature computation and/or the clustering
-	void SetFileLoadSaveOption (int F)
-	{
-		this->FileLoadSaveOption = F;
-	};
 
 	/// defines the Subsampling threshold. If the subsampling ratio is below this threshold,
 	/// the mesh will be subdivided accordingly. Default value: 10
@@ -90,7 +80,6 @@ template < class Metric > class vtkDiscreteRemeshing:public vtkSurfaceClustering
 
 	vtkSetMacro(ForceManifold, bool)
 
-	vtkSetMacro(InputDensityFile, char*)
 	vtkSetMacro(MaxCustomDensity, double)
 	vtkSetMacro(MinCustomDensity, double)
 	vtkSetMacro(CustomDensityMultiplicationFactor, double)
@@ -113,12 +102,6 @@ protected:
 	/// Experimental...
 	void FixClusteringToVoronoi ();
 
-	/// The window used to render the coarsened model
-	RenderWindow *OutputMeshWindow;
-	
-	/// The window used to render the curvature indicator
-	RenderWindow *IndicatorWindow;
-
 	/// The output triangulation
 	vtkSurface *Output;
 
@@ -131,17 +114,18 @@ protected:
 
 	/// Once the coarsened triangulation has been constructed, this method projects its vertices
 	/// on the original surface, to make the approximation better
-	void AdjustRemeshedGeometry ();
+    void AdjustRemeshedGeometry();
 
-	/// Checks wether the input vtkSurface has to be subdivided or not before clustering 
-	void CheckSubsamplingRatio ();
+    /// Checks wether the input vtkSurface has to be subdivided or not before
+    /// clustering
+    void CheckSubsamplingRatio();
 
-	/// Checks whether every output vertex is manifold
-	/// the non-conforming clusters while have their items density multiplied by Factor.
-	/// returns the number of vertices with issues.
-	int DetectNonManifoldOutputVertices (double Factor);
+    /// Checks whether every output vertex is manifold
+    /// the non-conforming clusters while have their items density multiplied by
+    /// Factor. returns the number of vertices with issues.
+    int DetectNonManifoldOutputVertices(double Factor);
 
-	/// the parameter storing the minimun subsampling ratio.
+    /// the parameter storing the minimun subsampling ratio.
 	/// if the actual subsampling ration is below, the input mesh will be subdivided accordingly
 	/// default value is 10
 	int SubsamplingThreshold;
@@ -158,9 +142,6 @@ protected:
 	vtkIntArray *VerticesParent1;
 	vtkIntArray *VerticesParent2;
 
-	/// this option can be set to skip curvature computation and/or clustering by reading precomputed files
-	int FileLoadSaveOption;
-
 	// Experimental (Nevermind)
 	void OptimizeOutputEdges ();
 
@@ -169,9 +150,6 @@ protected:
 
 	// flag to enable addition of polygons and points to fix the mesh boundaries
 	int BoundaryFixingFlag;
-
-	// name of custom imageData file giving user-defined density info
-	char* InputDensityFile;
 
 	double MaxCustomDensity;
 	double MinCustomDensity;
@@ -339,7 +317,6 @@ template < class Metric >
 //							<<ClusterItems[NeighbourCluster]->GetNumberOfIds()<<" items"<<endl;
 					}
 				}
-				this->Snapshot();
 			}
 		}
 	}
@@ -574,106 +551,32 @@ template < class Metric >
 
 	if (this->MetricContext.IsCurvatureIndicatorNeeded () == 1)
 	{
-		if (this->FileLoadSaveOption)
-		{
-			cout << "Do you want to compute the curvature	indicator? (0:No 1:Yes)	";
-			cin >> Compute;
-		}
-
 		vtkPolyData *PrincipalDirectionsPolyData = 0;
 		vtkDataArrayCollection *CurvatureCollection=0;
-		if ((Compute == 1) || (this->FileLoadSaveOption == 0))
-		{
-			if (this->InputDensityFile)
-			{
-				vtkImageReader2 *Reader;
-				if(strstr (this->InputDensityFile,".mnc") != NULL)
-				{
-					Reader=vtkMINCImageReader::New();
-					((vtkMINCImageReader*) Reader)->RescaleRealValuesOn();
-				}
-				else
-					Reader=vtkMetaImageReader::New();
+        if (Compute == 1) {
+            auto Curvature = vtkCurvatureMeasure::New();
+            if (this->OriginalInput)
+                Curvature->SetInputData(this->OriginalInput);
+            else
+                Curvature->SetInputData(this->Input);
 
-				Reader->SetFileName(this->InputDensityFile);
-				Reader->Update();
-				vtkImageData *Density=Reader->GetOutput();
-				CellsIndicators=vtkDoubleArray::New();
-				int NumberOfItems=this->GetNumberOfItems();
-				CellsIndicators->SetNumberOfValues(NumberOfItems);
-				CurvatureCollection=vtkDataArrayCollection::New();
-				CurvatureCollection->AddItem(CellsIndicators);
+            Curvature->SetComputationMethod(1);
+            Curvature->SetElementsType(this->ClusteringType);
+            Curvature->SetComputePrincipalDirections(
+                this->MetricContext.IsPrincipalDirectionsNeeded());
 
-				for (int i=0;i<NumberOfItems;i++)
-				{
-					double Coord[3];
-					int ijk[3];
-					double pcoords[3];
-					this->GetItemCoordinates(i,Coord);
-					Density->ComputeStructuredCoordinates(Coord,ijk,pcoords);
-					double Value=Density->GetScalarComponentAsDouble(ijk[0],ijk[1],ijk[2],0);
-					Value=this->MaxCustomDensity-Value*this->CustomDensityMultiplicationFactor;
-					if (Value<this->MinCustomDensity)
-						Value=this->MinCustomDensity;
-					CellsIndicators->SetValue(i,Value);
-				}
-				Reader->Delete();
-			}
-			else
-			{
-				vtkCurvatureMeasure *Curvature =vtkCurvatureMeasure::New ();
-				if (this->OriginalInput)
-					Curvature->SetInputData (this->OriginalInput);
-				else
-					Curvature->SetInputData (this->Input);
-			
-				Curvature->SetComputationMethod (1);
-				Curvature->SetElementsType (this->ClusteringType);
-				Curvature->SetComputePrincipalDirections (this->MetricContext.IsPrincipalDirectionsNeeded());
+            CurvatureCollection = Curvature->GetCurvatureIndicator();
+            CurvatureCollection->Register(this);
 
-				CurvatureCollection=Curvature->GetCurvatureIndicator();
-				CurvatureCollection->Register(this);
-			
-				CellsIndicators =(vtkDoubleArray *) CurvatureCollection->GetItem (0);
+            CellsIndicators = (vtkDoubleArray*)CurvatureCollection->GetItem(0);
 
-				if (this->FileLoadSaveOption != 0)
-				{
-					fstream CurvatureOutput;
-					CurvatureOutput.open ("curvature.dat", ofstream::out | ofstream::trunc | ios::binary);
-					int NumberOfItems;
-					vtkSurface *InputSurface;
-					if (this->OriginalInput)
-						InputSurface=this->OriginalInput;
-					else
-						InputSurface=this->Input;
-				
-					if (this->ClusteringType == 0)
-						NumberOfItems =InputSurface->GetNumberOfCells ();
-					else
-						NumberOfItems =InputSurface->GetNumberOfPoints ();
+            Curvature->Delete();
+        } else {
+            CellsIndicators = vtkDoubleArray::New();
+            CellsIndicators->SetNumberOfValues(this->GetNumberOfItems());
 
-					for (i = 0; i < NumberOfItems; i++)
-					{
-						double value;
-						value = CellsIndicators->GetValue (i);
-						CurvatureOutput.write ((char *) &value,sizeof (double));
-					}
-					CurvatureOutput.close ();
-				}
-
-				if ((this->MetricContext.IsPrincipalDirectionsNeeded () == 1)&&(this->Display!=0))
-					PrincipalDirectionsPolyData =Curvature->GetPrincipalDirectionsPolyData ();
-
-				Curvature->Delete ();
-			}
-		}
-		else
-		{
-			CellsIndicators = vtkDoubleArray::New ();
-			CellsIndicators->SetNumberOfValues (this->GetNumberOfItems());
-
-			fstream CurvatureInput;
-			CurvatureInput.open ("curvature.dat",ofstream::in | ios::binary);
+            fstream CurvatureInput;
+            CurvatureInput.open ("curvature.dat",ofstream::in | ios::binary);
 
 			for (i = 0; i < this->GetNumberOfItems (); i++)
 			{
@@ -682,13 +585,13 @@ template < class Metric >
 				CellsIndicators->SetValue (i, value);
 			}
 			CurvatureInput.close ();
-		}
+        }
 
-		// now we have to interpolate the curvature measure when the input mesh was subdivided
-		if (this->NumberOfSubdivisionsBeforeClustering != 0)
-		{
-			cout << "Interpolating...";
-			vtkDoubleArray *CellsIndicators2 =vtkDoubleArray::New ();
+        // now we have to interpolate the curvature measure when the input mesh
+        // was subdivided
+        if (this->NumberOfSubdivisionsBeforeClustering != 0) {
+            cout << "Interpolating...";
+            vtkDoubleArray *CellsIndicators2 =vtkDoubleArray::New ();
 			CellsIndicators2->SetNumberOfValues (this->GetNumberOfItems());
 
 			if (this->ClusteringType == 0)
@@ -734,9 +637,9 @@ template < class Metric >
 			CellsIndicators=CellsIndicators2;
 
 			cout << ".... Done" << endl;
-		}
-		double Range[2];
-		CellsIndicators->GetRange (Range);
+        }
+        double Range[2];
+        CellsIndicators->GetRange (Range);
 		cout<<"Indicators Range : "<<Range[0]<<"  "<<Range[1]<<endl;
 		double MaxIndicatorColor = 0;
 		double MeanIndicator = 0;
@@ -766,57 +669,6 @@ template < class Metric >
 
 		this->MetricContext.SetCurvatureInfo (CurvatureCollection);
 		CurvatureCollection->Delete();
-
-		if (this->Display)
-		{
-			RenderWindow *Window;
-			vtkPolyData *Mesh2 = vtkPolyData::New ();
-			Window = RenderWindow::New ();
-
-			Mesh2->ShallowCopy (this->Input);
-
-			if (this->ClusteringType == 0)
-			{
-				Mesh2->GetPointData()->SetScalars (0);
-				Mesh2->GetCellData()->SetScalars (CustomIndicatorColors);
-			}
-			else
-			{
-				Mesh2->GetPointData ()->SetScalars (CustomIndicatorColors);
-				Mesh2->GetCellData ()->SetScalars (0);
-			}
-
-			Window->SetInputData (Mesh2);
-			Mesh2->Delete();
-			if (PrincipalDirectionsPolyData)
-			{
-				Window->SetInputEdges (PrincipalDirectionsPolyData);
-				PrincipalDirectionsPolyData->Delete();
-			}	
-
-			vtkLookupTable *bwLut = vtkLookupTable::New ();
-			bwLut->SetTableRange (0, 1);
-
-			bwLut->SetSaturationRange (0, 0);	// Black     and     white
-			bwLut->SetHueRange (0, 0);
-			bwLut->SetValueRange (0, 1);
-			bwLut->SetScaleToLog10 ();
-			bwLut->Build ();
-			Window->SetLookupTable (bwLut);
-
-			Window->Render ();
-			Window->SetWindowName ("Curvature Indicator");
-			if (this->AnchorRenderWindow)
-				Window->AttachToRenderWindow (this->AnchorRenderWindow);
-			else
-				this->AnchorRenderWindow = Window;
-			Window->Interact ();
-			if (this->IndicatorWindow)
-				this->IndicatorWindow->Delete();
-			this->IndicatorWindow=Window;
-
-			bwLut->Delete ();
-		}
 	}
 	CustomIndicatorColors->Delete();
 }
@@ -871,46 +723,20 @@ template < class Metric > void vtkDiscreteRemeshing < Metric >::Remesh ()
 			GetNumberOfPoints () << " vertices	and	" << this->
 			GetInput ()->GetNumberOfCells () << " faces" << endl;
 
-	if (this->FileLoadSaveOption)
-	{
-		cout << "Do you want to compute the clustering? (0:NO	1:Yes) ";
-		cin >> Compute;
-	}
-	if ((Compute == 1) || (this->FileLoadSaveOption == 0))
-	{
-		this->ProcessClustering ();
+    this->Init();
+    fstream ClusteringInput;
+    ClusteringInput.open("clustering.dat", ofstream::in | ios::binary);
 
-		if (this->FileLoadSaveOption == 1)
-		{
-			fstream ClusteringOutput;
-			ClusteringOutput.open ("clustering.dat", ofstream::out | ofstream::trunc | ios::binary);
-			for (i = 0; i < this->GetNumberOfItems (); i++)
-			{
-				int value;
-				value = this->Clustering->GetValue (i);
-				ClusteringOutput.write ((char *) &value, sizeof (int));
-			}
-			ClusteringOutput.close ();
-		}
-	}
-	else
-	{
-		this->Init ();
-		fstream ClusteringInput;
-		ClusteringInput.open ("clustering.dat",ofstream::in | ios::binary);
+    for (i = 0; i < this->GetNumberOfItems(); i++) {
+        int value;
+        ClusteringInput.read((char*)&value, sizeof(int));
+        this->Clustering->SetValue(i, value);
+    }
+    ClusteringInput.close();
 
-		for (i = 0; i < this->GetNumberOfItems (); i++)
-		{
-			int value;
-			ClusteringInput.read ((char *) &value, sizeof (int));
-			this->Clustering->SetValue (i, value);
-		}
-		ClusteringInput.close ();
+    this->ReComputeStatistics();
 
-		this->ReComputeStatistics ();
-	}
-
-	this->BuildDelaunayTriangulation ();
+    this->BuildDelaunayTriangulation ();
 	double Factor=2;
 	if (this->ForceManifold)
 	{
@@ -1100,38 +926,16 @@ template < class Metric >
 	}
 
 	if (this->ConsoleOutput)
-		this->Output->DisplayMeshProperties ();
+        this->Output->DisplayMeshProperties();
 
-	if (this->Display > 0)
-	{
-		if (this->OutputMeshWindow==0)
-			this->OutputMeshWindow = RenderWindow::New ();
-		this->OutputMeshWindow->SetInputData (this->Output);
-		this->OutputMeshWindow->DisplayInputEdges ();
-		this->OutputMeshWindow->Render ();
-		this->OutputMeshWindow->SetWindowName ("Coarsened model");
-		this->OutputMeshWindow->SetLookupTable ();
-		if (this->AnchorRenderWindow)
-			this->OutputMeshWindow->AttachToRenderWindow (this->AnchorRenderWindow);
-		this->OutputMeshWindow->Interact ();
-	}
-
-	if (this->EdgeOptimizationFlag == 1)
-	{
-		this->OptimizeOutputEdges ();
+    if (this->EdgeOptimizationFlag == 1) {
+        this->OptimizeOutputEdges ();
 		if (this->ConsoleOutput)
 		{
 			cout<<"After Edges Optimization : "<<endl;
 			this->Output->DisplayMeshProperties();
 		}
-		if (this->Display > 0)
-		{
-			this->OutputMeshWindow->SetWindowName("Coarsened model (after edge flips)");
-			OutputMeshWindow->DisplayInputEdges ();
-			this->OutputMeshWindow->Render ();
-			this->OutputMeshWindow->Interact ();
-		}
-	}
+    }
 }
 
 template < class Metric >
@@ -1221,16 +1025,11 @@ template < class Metric >
 {
 	this->BoundaryFixingFlag = 0;
 	this->EdgeOptimizationFlag = 0;
-	this->AnchorRenderWindow = 0;
-	this->FileLoadSaveOption = 0;
 	this->OriginalInput = 0;
 	this->VerticesParent1 = 0;
 	this->VerticesParent2 = 0;
 	this->SubsamplingThreshold = 10;
 	this->NumberOfSubdivisionsBeforeClustering = 0;
-	this->OutputMeshWindow=0;
-	this->IndicatorWindow=0;
-	this->InputDensityFile=0;
 	this->MaxCustomDensity=1;
 	this->MinCustomDensity=0.1;
 	this->CustomDensityMultiplicationFactor=0.001;
@@ -1253,11 +1052,5 @@ template < class Metric >
 		
 	if (this->VerticesParent2)
 		this->VerticesParent2->Delete();
-	
-	if (this->OutputMeshWindow)
-		this->OutputMeshWindow->Delete();
-	
-	if (this->IndicatorWindow)
-		this->IndicatorWindow->Delete();
 }
 #endif
