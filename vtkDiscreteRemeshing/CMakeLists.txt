@@ -34,6 +34,12 @@ target_include_directories(vtkDiscreteRemeshing
 target_link_libraries(vtkDiscreteRemeshing
     PUBLIC
         vtkSurface
+    PRIVATE
+        vtkCommonCore
+        vtkInteractionStyle
+        vtkRenderingCore
+        vtkRenderingFreeType
+        vtkRenderingOpenGL2
 )
 set_target_properties(vtkDiscreteRemeshing
   PROPERTIES

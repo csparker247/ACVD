@@ -28,6 +28,7 @@ target_include_directories(vtkSurface
 target_link_libraries(vtkSurface
     PRIVATE
         vtkCommonCore
+        vtkFiltersHybrid
         vtkIOExport
         vtkIOExportOpenGL2
         vtkIOExportPDF

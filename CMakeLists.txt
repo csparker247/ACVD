@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(ACVD VERSION 1.0.1)
+project(ACVD VERSION 1.0.2)
 
 set(ACVD_LIB_SOVERSION ${ACVD_MAJOR_VERSION}.${ACVD_MINOR_VERSION} )
 
@@ -73,4 +73,3 @@ install(
     NAMESPACE "ACVD::"
     DESTINATION ${INSTALL_CMAKE_DIR}
 )
-
