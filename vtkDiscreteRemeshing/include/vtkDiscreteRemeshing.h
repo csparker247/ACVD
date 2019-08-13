@@ -317,7 +317,6 @@ template < class Metric >
 //							<<ClusterItems[NeighbourCluster]->GetNumberOfIds()<<" items"<<endl;
 					}
 				}
-				this->Snapshot();
 			}
 		}
 	}
@@ -552,15 +551,9 @@ template < class Metric >
 
 	if (this->MetricContext.IsCurvatureIndicatorNeeded () == 1)
 	{
-		if (this->FileLoadSaveOption)
-		{
-			cout << "Do you want to compute the curvature	indicator? (0:No 1:Yes)	";
-			cin >> Compute;
-		}
-
 		vtkPolyData *PrincipalDirectionsPolyData = 0;
 		vtkDataArrayCollection *CurvatureCollection=0;
-        if ((Compute == 1) || (this->FileLoadSaveOption == 0)) {
+        if (Compute == 1) {
             auto Curvature = vtkCurvatureMeasure::New();
             if (this->OriginalInput)
                 Curvature->SetInputData(this->OriginalInput);
@@ -730,46 +723,20 @@ template < class Metric > void vtkDiscreteRemeshing < Metric >::Remesh ()
 			GetNumberOfPoints () << " vertices	and	" << this->
 			GetInput ()->GetNumberOfCells () << " faces" << endl;
 
-	if (this->FileLoadSaveOption)
-	{
-		cout << "Do you want to compute the clustering? (0:NO	1:Yes) ";
-		cin >> Compute;
-	}
-	if ((Compute == 1) || (this->FileLoadSaveOption == 0))
-	{
-		this->ProcessClustering ();
+    this->Init();
+    fstream ClusteringInput;
+    ClusteringInput.open("clustering.dat", ofstream::in | ios::binary);
 
-		if (this->FileLoadSaveOption == 1)
-		{
-			fstream ClusteringOutput;
-			ClusteringOutput.open ("clustering.dat", ofstream::out | ofstream::trunc | ios::binary);
-			for (i = 0; i < this->GetNumberOfItems (); i++)
-			{
-				int value;
-				value = this->Clustering->GetValue (i);
-				ClusteringOutput.write ((char *) &value, sizeof (int));
-			}
-			ClusteringOutput.close ();
-		}
-	}
-	else
-	{
-		this->Init ();
-		fstream ClusteringInput;
-		ClusteringInput.open ("clustering.dat",ofstream::in | ios::binary);
+    for (i = 0; i < this->GetNumberOfItems(); i++) {
+        int value;
+        ClusteringInput.read((char*)&value, sizeof(int));
+        this->Clustering->SetValue(i, value);
+    }
+    ClusteringInput.close();
 
-		for (i = 0; i < this->GetNumberOfItems (); i++)
-		{
-			int value;
-			ClusteringInput.read ((char *) &value, sizeof (int));
-			this->Clustering->SetValue (i, value);
-		}
-		ClusteringInput.close ();
+    this->ReComputeStatistics();
 
-		this->ReComputeStatistics ();
-	}
-
-	this->BuildDelaunayTriangulation ();
+    this->BuildDelaunayTriangulation ();
 	double Factor=2;
 	if (this->ForceManifold)
 	{
@@ -1058,16 +1025,11 @@ template < class Metric >
 {
 	this->BoundaryFixingFlag = 0;
 	this->EdgeOptimizationFlag = 0;
-	this->AnchorRenderWindow = 0;
-	this->FileLoadSaveOption = 0;
 	this->OriginalInput = 0;
 	this->VerticesParent1 = 0;
 	this->VerticesParent2 = 0;
 	this->SubsamplingThreshold = 10;
 	this->NumberOfSubdivisionsBeforeClustering = 0;
-	this->OutputMeshWindow=0;
-	this->IndicatorWindow=0;
-	this->InputDensityFile=0;
 	this->MaxCustomDensity=1;
 	this->MinCustomDensity=0.1;
 	this->CustomDensityMultiplicationFactor=0.001;
@@ -1090,11 +1052,5 @@ template < class Metric >
 		
 	if (this->VerticesParent2)
 		this->VerticesParent2->Delete();
-	
-	if (this->OutputMeshWindow)
-		this->OutputMeshWindow->Delete();
-	
-	if (this->IndicatorWindow)
-		this->IndicatorWindow->Delete();
 }
 #endif
