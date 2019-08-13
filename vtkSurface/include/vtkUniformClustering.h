@@ -568,16 +568,15 @@ void vtkUniformClustering<Metric,EdgeType>::FillHolesInClustering(vtkIntArray *C
 			Cluster1=Clustering->GetValue(I1);
 			Cluster2=Clustering->GetValue(I2);
 
-			if ((Cluster1==this->NumberOfClusters))
-			{
-				TempValue=I1;
+            if (Cluster1 == this->NumberOfClusters) {
+                TempValue=I1;
 				I1=I2;
 				I2=TempValue;
 				Cluster1=Cluster2;
 				Cluster2=this->NumberOfClusters;
-			}
-			
-			if ((Cluster1!=this->NumberOfClusters)&&(Cluster2==this->NumberOfClusters)
+            }
+
+            if ((Cluster1!=this->NumberOfClusters)&&(Cluster2==this->NumberOfClusters)
 					&&(this->ConnexityConstraintProblem(I2,Edge,Cluster2,Cluster1)==0))
 			{
 				Clustering->SetValue(I2,Cluster1);

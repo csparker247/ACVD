@@ -15,6 +15,9 @@ target_include_directories(vtkVolumeProcessing
 target_link_libraries(vtkVolumeProcessing
     PRIVATE
         vtkCommonCore
+        vtkCommonExecutionModel
+        vtkIOImage
+        vtkmetaio
 )
 
 set_target_properties(vtkVolumeProcessing

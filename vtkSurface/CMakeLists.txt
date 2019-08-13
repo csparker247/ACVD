@@ -23,6 +23,9 @@ target_include_directories(vtkSurface
 target_link_libraries(vtkSurface
     PRIVATE
         vtkCommonCore
+        vtkCommonDataModel
+        vtkCommonSystem
+        vtkFiltersCore
 )
 
 set_target_properties(vtkSurface

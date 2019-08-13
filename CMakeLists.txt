@@ -18,7 +18,7 @@ set(INSTALL_CMAKE_DIR lib/cmake/ACVD CACHE PATH "Installation directory for CMak
 option(BUILD_DOCUMENTATION "Build the html documentation with doxygen." OFF)
 option(BUILD_DISCRETEREMESHING "Build Discrete Remeshing Tools." ON)
 option(BUILD_VOLUMEPROCESSING "Build Volume tools" ON)
-option(BUILD_EXAMPLES "Build examples" ON)
+option(BUILD_EXAMPLES "Build examples" OFF)
 
 # App manifest
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ACVD.json ${EXECUTABLE_OUTPUT_PATH}/ACVD.json COPYONLY)
