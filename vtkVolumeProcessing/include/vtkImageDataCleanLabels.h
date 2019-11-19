@@ -12,7 +12,7 @@ public :
 
 protected :
 
-	virtual void SimpleExecute (vtkImageData *input, vtkImageData *output);
+	virtual void SimpleExecute (vtkImageData *input, vtkImageData *output) override;
 
 	/// the constructor
 	vtkImageDataCleanLabels()
@@ -24,4 +24,3 @@ protected :
 	{
 	}
 };
-
