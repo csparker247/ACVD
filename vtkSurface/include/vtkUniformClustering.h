@@ -35,6 +35,8 @@
 
 #include <algorithm>
 #include <queue>
+#include <random>
+
 #include <vtkBitArray.h>
 #include <vtkCellData.h>
 #include <vtkCommand.h>
@@ -1148,9 +1150,11 @@ void vtkUniformClustering<Metric,EdgeType>::ComputeInitialRandomSampling(vtkIdLi
 	std::queue<int>	IQueue;
 
 	// shuffle the Ids ordering
+    std::random_device rd;
+    std::mt19937 g(rd());
 	for	(int i=0;i<NumberOfRemainingItems;i++)
 		Items[i]=i;
-	std::random_shuffle(Items, Items+NumberOfRemainingItems);
+	std::shuffle(Items, Items+NumberOfRemainingItems, g);
 
 	// compute total weight
 	double SWeights=0;
@@ -1222,7 +1226,7 @@ void vtkUniformClustering<Metric,EdgeType>::ComputeInitialRandomSampling(vtkIdLi
 		Items[i]=i;
 	}
 
-	std::random_shuffle(Items, Items+NumberOfItems);
+	std::shuffle(Items, Items+NumberOfItems, g);
 	FirstItem=0;
 	while(NumberOfRemainingRegions>0)
 	{

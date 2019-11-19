@@ -3,31 +3,31 @@
                              -------------------
     begin                : jeu sep 25 2003
     copyright            : (C) 2003 by Sebastien Valette
-    email                : 
+    email                :
  ***************************************************************************/
- 
+
  /* ---------------------------------------------------------------------
 
 * Copyright (c) CREATIS-LRMN (Centre de Recherche en Imagerie Medicale)
 * Author : Sebastien Valette
 *
-*  This software is governed by the CeCILL-B license under French law and 
-*  abiding by the rules of distribution of free software. You can  use, 
-*  modify and/ or redistribute the software under the terms of the CeCILL-B 
-*  license as circulated by CEA, CNRS and INRIA at the following URL 
-*  http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html 
+*  This software is governed by the CeCILL-B license under French law and
+*  abiding by the rules of distribution of free software. You can  use,
+*  modify and/ or redistribute the software under the terms of the CeCILL-B
+*  license as circulated by CEA, CNRS and INRIA at the following URL
+*  http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
 *  or in the file LICENSE.txt.
 *
 *  As a counterpart to the access to the source code and  rights to copy,
 *  modify and redistribute granted by the license, users are provided only
 *  with a limited warranty  and the software's author,  the holder of the
 *  economic rights,  and the successive licensors  have only  limited
-*  liability. 
+*  liability.
 *
 *  The fact that you are presently reading this means that you have had
 *  knowledge of the CeCILL-B license and that you accept its terms.
-* ------------------------------------------------------------------------ */  
- 
+* ------------------------------------------------------------------------ */
+
 #ifndef _VTKDISCRETEREMESHING_H_
 #define _VTKDISCRETEREMESHING_H_
 
@@ -41,7 +41,7 @@
 #include "vtkTag.h"
 
 // A Class to process coarsening of vtkSurface PolyData. It derives from vtkSurfaceClustering
-// This class adds meshing features to the clustering class, as proposed in : 
+// This class adds meshing features to the clustering class, as proposed in :
 // " Approximated Centroidal Voronoi Diagrams for Uniform Polygonal Mesh Coarsening", Valette & Chassery, Eurographics 2004
 
 template <class Metric>
@@ -71,7 +71,7 @@ class vtkDiscreteRemeshing : public vtkSurfaceClustering<Metric>
 	{
 		this->EdgeOptimizationFlag = S;
 	};
-	
+
 	// Sets On/Off the fix for meshes with boundaries. Default value: 1 (On)
 	void SetBoundaryFixing (int B)
 	{
@@ -116,14 +116,14 @@ protected:
 	/// on the original surface, to make the approximation better
     void AdjustRemeshedGeometry();
 
-    /// Checks wether the input vtkSurface has to be subdivided or not before
-    /// clustering
-    void CheckSubsamplingRatio();
+  /// Checks wether the input vtkSurface has to be subdivided or not before
+  /// clustering
+  void CheckSubsamplingRatio();
 
-    /// Checks whether every output vertex is manifold
-    /// the non-conforming clusters while have their items density multiplied by
-    /// Factor. returns the number of vertices with issues.
-    int DetectNonManifoldOutputVertices(double Factor);
+  /// Checks whether every output vertex is manifold
+  /// the non-conforming clusters while have their items density multiplied by
+  /// Factor. returns the number of vertices with issues.
+  int DetectNonManifoldOutputVertices(double Factor);
 
     /// the parameter storing the minimun subsampling ratio.
 	/// if the actual subsampling ration is below, the input mesh will be subdivided accordingly
@@ -137,7 +137,7 @@ protected:
 	int NumberOfSubdivisionsBeforeClustering;
 
 	/// this array stores the parent-child informations (2 ints for each vertex: its two parents)
-	/// it is used only when the mesh is bubdivided before simplification, to interpolate the 
+	/// it is used only when the mesh is bubdivided before simplification, to interpolate the
 	// curvature indicator;
 	vtkIntArray *VerticesParent1;
 	vtkIntArray *VerticesParent2;
@@ -276,7 +276,7 @@ template < class Metric >
 			{
 				vtkIdType v1,v2,v3;
 				this->Input->GetFaceVertices(FList->GetId(j),v1,v2,v3);
-				cout<<FList->GetId(j)<<" : vertices "<<v1<<" "<<v2<<" "<<v3<<endl;			
+				cout<<FList->GetId(j)<<" : vertices "<<v1<<" "<<v2<<" "<<v3<<endl;
 			}*/
 			this->GetItemNeighbours(Item,IList);
 			bool found=false;
@@ -432,11 +432,11 @@ template < class Metric >
 	{
 		if (EdgesNewPoint[i] < 0)
 		{
-			// the edge was not visited previously 
+			// the edge was not visited previously
 			this->Input->GetEdgeFaces (i, f1, f2);
 			if ((f2 < 0) && (f1 >= 0))
 			{
-				// the edge is a boundary edge 
+				// the edge is a boundary edge
 				// with two vertices belonging to the same cluster
 
 				this->Input->GetEdgeVertices (i, v1, v2);
@@ -624,8 +624,8 @@ template < class Metric >
 				}
 				for (i = OriginalInput->GetNumberOfPoints ();i < this->Input->GetNumberOfPoints ();i++)
 				{
-					CellsIndicators2->SetValue (i, 
-						(						
+					CellsIndicators2->SetValue (i,
+						(
 						CellsIndicators2->GetValue(this->VerticesParent1->GetValue(i)) +
 						CellsIndicators2->GetValue(this->VerticesParent2->GetValue(i))
 						) *0.5);
@@ -688,7 +688,7 @@ template < class Metric >
 			this->VerticesParent2 = vtkIntArray::New ();
 	}
 
-	while (Levels[NumberOfSubdivisionsBeforeClustering]->GetNumberOfPoints () 
+	while (Levels[NumberOfSubdivisionsBeforeClustering]->GetNumberOfPoints ()
 				<this->SubsamplingThreshold * (this->NumberOfClusters-this->NumberOfSpareClusters))
 	{
 		if (this->ConsoleOutput)
@@ -705,11 +705,12 @@ template < class Metric >
 		this->OriginalInput = this->Input;
 		this->Input = Levels[NumberOfSubdivisionsBeforeClustering];
 		for (i = 1; i < NumberOfSubdivisionsBeforeClustering; i++)
-		{		
+		{
 			Levels[i]->Delete ();
 		}
 	}
 }
+
 template < class Metric > void vtkDiscreteRemeshing < Metric >::Remesh ()
 {
 	int i;
@@ -718,23 +719,13 @@ template < class Metric > void vtkDiscreteRemeshing < Metric >::Remesh ()
 	this->CheckSubsamplingRatio ();
 	this->SamplingPreProcessing ();
 
-	if (this->ConsoleOutput)
+	if (this->ConsoleOutput) {
 		cout << "Input mesh: " << this->GetInput ()->
 			GetNumberOfPoints () << " vertices	and	" << this->
 			GetInput ()->GetNumberOfCells () << " faces" << endl;
-
-    this->Init();
-    fstream ClusteringInput;
-    ClusteringInput.open("clustering.dat", ofstream::in | ios::binary);
-
-    for (i = 0; i < this->GetNumberOfItems(); i++) {
-        int value;
-        ClusteringInput.read((char*)&value, sizeof(int));
-        this->Clustering->SetValue(i, value);
     }
-    ClusteringInput.close();
 
-    this->ReComputeStatistics();
+    this->ProcessClustering ();
 
     this->BuildDelaunayTriangulation ();
 	double Factor=2;
@@ -979,10 +970,10 @@ template < class Metric >
 	 * int  i,j;
 	 * double P1[3],P2[3],P3[3],P4[3],P12[3],P34[3];
 	 * vtkIdType v1,v2,v3,v4,f1,f2;
-	 * 
+	 *
 	 * double Quadric[10];
 	 * double d1,d2;
-	 * 
+	 *
 	 * for  (i=0;i<this->Output->GetNumberOfEdges();i++)
 	 * {
 	 * Output->GetEdgeFaces(i,f1,f2);
@@ -997,20 +988,20 @@ template < class Metric >
 	 * Output->GetPoints()->GetPoint(v2,P2);
 	 * Output->GetPoints()->GetPoint(v3,P3);
 	 * Output->GetPoints()->GetPoint(v4,P4);
-	 * 
+	 *
 	 * for  (j=0;j<10;j++)
 	 * Quadric[j]=
 	 * Quadrics[v1][j]
 	 * +Quadrics[v2][j];
 	 * //+Quadrics[v3][j]
 	 * //+Quadrics[v4][j];
-	 * 
+	 *
 	 * for  (j=0;j<3;j++)
 	 * {
 	 * P12[j]=0.5*(P1[j]+P2[j]);
 	 * P34[j]=0.5*(P3[j]+P4[j]);
 	 * }
-	 * d1=this->ComputeQuadraticDistance(P12,Quadric);      
+	 * d1=this->ComputeQuadraticDistance(P12,Quadric);
 	 * d2=this->ComputeQuadraticDistance(P34,Quadric);
 	 * if (d1*0.6>d2)
 	 * Output->FlipEdge(i);
@@ -1043,13 +1034,13 @@ template < class Metric >
 {
 	if (this->OriginalInput)
 		this->OriginalInput->Delete();
-		
+
 	if (this->Output)
 		this->Output->Delete();
-	
+
 	if (this->VerticesParent1)
 		this->VerticesParent1->Delete();
-		
+
 	if (this->VerticesParent2)
 		this->VerticesParent2->Delete();
 }
