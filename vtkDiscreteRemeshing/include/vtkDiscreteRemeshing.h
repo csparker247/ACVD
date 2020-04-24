@@ -544,7 +544,6 @@ template < class Metric >
 	void vtkDiscreteRemeshing < Metric >::SamplingPreProcessing ()
 {
 	int i;
-	int Compute = 0;
 	vtkDoubleArray *CellsIndicators;
 	vtkDoubleArray *CustomIndicatorColors = vtkDoubleArray::New ();
 	CustomIndicatorColors->SetNumberOfValues (this->GetNumberOfItems ());
@@ -553,39 +552,24 @@ template < class Metric >
 	{
 		vtkPolyData *PrincipalDirectionsPolyData = 0;
 		vtkDataArrayCollection *CurvatureCollection=0;
-        if (Compute == 1) {
-            auto Curvature = vtkCurvatureMeasure::New();
-            if (this->OriginalInput)
-                Curvature->SetInputData(this->OriginalInput);
-            else
-                Curvature->SetInputData(this->Input);
 
-            Curvature->SetComputationMethod(1);
-            Curvature->SetElementsType(this->ClusteringType);
-            Curvature->SetComputePrincipalDirections(
-                this->MetricContext.IsPrincipalDirectionsNeeded());
+        auto Curvature = vtkCurvatureMeasure::New();
+        if (this->OriginalInput)
+            Curvature->SetInputData(this->OriginalInput);
+        else
+            Curvature->SetInputData(this->Input);
 
-            CurvatureCollection = Curvature->GetCurvatureIndicator();
-            CurvatureCollection->Register(this);
+        Curvature->SetComputationMethod(1);
+        Curvature->SetElementsType(this->ClusteringType);
+        Curvature->SetComputePrincipalDirections(
+            this->MetricContext.IsPrincipalDirectionsNeeded());
 
-            CellsIndicators = (vtkDoubleArray*)CurvatureCollection->GetItem(0);
+        CurvatureCollection = Curvature->GetCurvatureIndicator();
+        CurvatureCollection->Register(this);
 
-            Curvature->Delete();
-        } else {
-            CellsIndicators = vtkDoubleArray::New();
-            CellsIndicators->SetNumberOfValues(this->GetNumberOfItems());
+        CellsIndicators = (vtkDoubleArray*)CurvatureCollection->GetItem(0);
 
-            fstream CurvatureInput;
-            CurvatureInput.open ("curvature.dat",ofstream::in | ios::binary);
-
-			for (i = 0; i < this->GetNumberOfItems (); i++)
-			{
-				double value;
-				CurvatureInput.read ((char *) &value,sizeof (double));
-				CellsIndicators->SetValue (i, value);
-			}
-			CurvatureInput.close ();
-        }
+        Curvature->Delete();
 
         // now we have to interpolate the curvature measure when the input mesh
         // was subdivided
