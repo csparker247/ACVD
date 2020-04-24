@@ -26,6 +26,7 @@ add_library(vtkDiscreteRemeshing
     src/vtkTestUniformClustering.cxx
     src/vtkManifoldSimplification.cxx
 )
+add_library("ACVD::vtkDiscreteRemeshing" ALIAS vtkDiscreteRemeshing)
 target_include_directories(vtkDiscreteRemeshing
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
