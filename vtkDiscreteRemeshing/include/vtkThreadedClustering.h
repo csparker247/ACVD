@@ -64,8 +64,8 @@ public:
     }
 
     void Delete() { delete this; }
-    vtkMySimpleCriticalSection(){}
-    virtual ~vtkMySimpleCriticalSection(){}
+    vtkMySimpleCriticalSection() {}
+    virtual ~vtkMySimpleCriticalSection() {}
 };
 
 // Class derived from vtkUniformClustering

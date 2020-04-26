@@ -66,7 +66,7 @@ public:
 
 protected:
     vtkAnisotropicDiscreteRemeshing() {}
-    ~vtkAnisotropicDiscreteRemeshing(){}
+    ~vtkAnisotropicDiscreteRemeshing() {}
 };
 
 #endif

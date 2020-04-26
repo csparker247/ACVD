@@ -779,7 +779,7 @@ vtkIdType vtkSurfaceBase::FlipEdge(vtkIdType edge)
     this->GetEdgeFaces(edge, f1, f2);
     if (f2 < 0) {
         //		cout<<"*** Problem: flip edge <<"<<edge<<" which is not adjacent
-        //to 2 faces !***"<<endl;
+        // to 2 faces !***"<<endl;
         return (edge);
     }
     this->GetEdgeVertices(edge, v1, v2);
@@ -789,7 +789,7 @@ vtkIdType vtkSurfaceBase::FlipEdge(vtkIdType edge)
     edge1 = this->IsEdge(v3, v4);
     if (edge1 >= 0) {
         //		cout<<"*** Problem: flip edge "<<edge<<" but the resulting edge
-        //already exists!***"<<endl;
+        // already exists!***"<<endl;
         return (edge1);
     }
 

@@ -193,7 +193,7 @@ public:
         this->CustomWeights = 0;
         this->Gradation = 0;
     }
-    ~vtkL21MetricForClustering(){}
+    ~vtkL21MetricForClustering() {}
 
     void BuildMetric(
         Item*& Items,

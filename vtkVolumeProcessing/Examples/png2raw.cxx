@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 
         cout << "Scalar Type : " << Image->GetScalarType() << endl;
         //		cout<<"Valeur "<<*(unsigned
-        //short*)Image->GetScalarPointer(220,272,0)<<endl;;
+        // short*)Image->GetScalarPointer(220,272,0)<<endl;;
         char* Pointer = (char*)Image->GetScalarPointer(0, 0, 0);
 
         int Dimensions[3];

@@ -276,11 +276,11 @@ void ResampledVolumeGenerator::StartWork()
                 iteration++;
                 // ENCORE A FAIRE: Trouver une manière pour ne pas devoir créer
                 // un nouveau reader/image à chaque fois ENCORE A FAIRE: Il y a
-                // quelque chose d'inefficient . J'utilise une instance du reader
-                // pour obtenir les paramètres de l'image, et de nombreuses
-                // autres instances pour lire les subvolumes. Ce n'est pas très
-                // intelligent, est-ce qu'il n'existe pas une manière plus
-                // intelligente de faire cela ?
+                // quelque chose d'inefficient . J'utilise une instance du
+                // reader pour obtenir les paramètres de l'image, et de
+                // nombreuses autres instances pour lire les subvolumes. Ce
+                // n'est pas très intelligent, est-ce qu'il n'existe pas une
+                // manière plus intelligente de faire cela ?
                 /*std::cout << "This is the filename we're working with " <<
                  * _filename << std::endl;*/
                 vtkOOCMetaImageReader* reader = vtkOOCMetaImageReader::New();
@@ -312,7 +312,8 @@ void ResampledVolumeGenerator::StartWork()
                 // du reader pour obtenir la metadata et les données du fichier?
                 // ENCORE A FAIRE: écrire ligne par ligne et pas pixel par pixel
                 // En fait, tout ce qui vient après devrait se faire dans une
-                // autre classe que soit en charge de l'écriture dans le fichier!
+                // autre classe que soit en charge de l'écriture dans le
+                // fichier!
                 std::cout << "Is this trick writing?" << std::endl;
                 int _sextent[6];
                 sousVolume->GetExtent(_sextent);

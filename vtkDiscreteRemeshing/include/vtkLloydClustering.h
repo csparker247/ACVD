@@ -56,7 +56,7 @@ protected:
     class LloydPriorityQueue
     {
     public:
-        void Allocate(int N){}
+        void Allocate(int N) {}
         int GetNumberOfItems() { return Queue.size(); }
         void Insert(double Priority, int Item)
         {
@@ -90,10 +90,10 @@ protected:
         std::priority_queue<Distance> Queue;
 
         // the constructor
-        LloydPriorityQueue(){}
+        LloydPriorityQueue() {}
 
         // the destructor
-        ~LloydPriorityQueue(){}
+        ~LloydPriorityQueue() {}
     };
 
     LloydPriorityQueue* PriorityQueue;

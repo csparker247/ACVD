@@ -49,9 +49,9 @@ public:
     }
 
 protected:
-    vtkClusteringExample(){}
+    vtkClusteringExample() {}
 
-    ~vtkClusteringExample(){}
+    ~vtkClusteringExample() {}
 
     void GetItemCoordinates(vtkIdType Item, double* P) {}
 
@@ -59,15 +59,16 @@ protected:
 
     int GetNumberOfDualItems() { return (0); }
 
-    void GetItemNeighbours(vtkIdType Item, vtkIdList* IList){}
+    void GetItemNeighbours(vtkIdType Item, vtkIdList* IList) {}
 
     int GetNumberOfItems() { return (0); }
 
-    void AddItemRingToProcess(vtkIdType Item){
+    void AddItemRingToProcess(vtkIdType Item)
+    {
         //			this->AddEdgeToProcess();
     }
 
-    void GetEdgeItems(vtkIdType Item, vtkIdType& I1, vtkIdType& I2){}
+    void GetEdgeItems(vtkIdType Item, vtkIdType& I1, vtkIdType& I2) {}
 
     void GetItemEdges(vtkIdType Item, vtkIdList* EList) {}
 
@@ -84,22 +85,22 @@ protected:
 
     EdgeType GetNumberOfEdges() { return (0); }
 
-    void GetEdgeItemsSure(vtkIdType Item, vtkIdList* VList){}
+    void GetEdgeItemsSure(vtkIdType Item, vtkIdList* VList) {}
 
-    void SetNumberOfProcesses(int N){}
+    void SetNumberOfProcesses(int N) {}
 
 protected:
     int NumberOfProcesses;
 
-    void CreateWindows(){}
-    void Snapshot(){}
-    void BuildMetric(){}
+    void CreateWindows() {}
+    void Snapshot() {}
+    void BuildMetric() {}
 };
 
 class vtkMetricExample
 {
 public:
-    void SetConstrainedClustering(int C){}
+    void SetConstrainedClustering(int C) {}
 
     struct Item {
         double Weight;
@@ -132,8 +133,8 @@ public:
     void SetClusterCentroid(Cluster* C, double* P) {}
     void ResetCluster(Cluster* C) {}
 
-    vtkMetricExample(){}
-    ~vtkMetricExample(){}
+    vtkMetricExample() {}
+    ~vtkMetricExample() {}
 };
 
 #endif

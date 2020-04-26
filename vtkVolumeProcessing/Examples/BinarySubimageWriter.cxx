@@ -125,8 +125,8 @@ void BinarySubimageWriter::WriteToFile()
     // Pareil pour le reste / Similar for the rest
     // A FAIRE: Les dimensions de l'image sont des fouteurs de merde. Il faut
     // taffer dessus!
-    /*std::cout << "			Image dimensions " << _imageDimensions[0] << " " <<
-    _imageDimensions[1] << " " << _imageDimensions[2] << std::endl;
+    /*std::cout << "			Image dimensions " << _imageDimensions[0] << " "
+    << _imageDimensions[1] << " " << _imageDimensions[2] << std::endl;
     std::cout << "Pixel size " << _pixelSize << std::endl;*/
 
     int exi = _subimageExtent[0];
@@ -137,7 +137,8 @@ void BinarySubimageWriter::WriteToFile()
 
     int ezi = _subimageExtent[4];
     int ezf = _subimageExtent[5];
-    /*std::cout << "			Extent de chaque image " << exi << " " << exf << " "
+    /*std::cout << "			Extent de chaque image " << exi << " " << exf << "
+     * "
      * << eyi << " " << eyf << " " << ezi << " " << ezf << " " << std::endl;*/
 
     // std::cout << "		Before writing the subvolume into the file " <<
