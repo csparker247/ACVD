@@ -5,60 +5,58 @@
   Language:  C++
   Date:      2008/03
   Auteur:    Sebastien VALETTE
-  
+
 =========================================================================*/
 
 #ifndef __vtkManifoldSimplification_h
 #define __vtkManifoldSimplification_h
 
-#include "vtkSurface.h"
 #include "vtkPriorityQueue.h"
+#include "vtkSurface.h"
 
 class VTK_EXPORT vtkManifoldSimplification : public vtkObject
 {
 
 public:
+    // Create an instance of vtkManifoldSimplification
+    static vtkManifoldSimplification* New();
 
-	// Create an instance of vtkManifoldSimplification
-    static vtkManifoldSimplification *New();
+    // Define the input mesh
+    vtkSetObjectMacro(Input, vtkSurface)
 
-	// Define the input mesh
-	vtkSetObjectMacro(Input, vtkSurface)
+        // Simplify the input mesh
+        void Simplify();
 
-	// Simplify the input mesh
-	void Simplify();
+    // Set the number of desired vertices
+    vtkSetMacro(NumberOfOutputVertices, int)
 
-	// Set the number of desired vertices
-	vtkSetMacro(NumberOfOutputVertices, int)
+        protected :
 
-protected:
+        void AllocateMemory();
+    void ReleaseMemory();
+    void UpdateEdgePriority(vtkIdType Edge);
 
-	void AllocateMemory();
-	void ReleaseMemory();
-	void UpdateEdgePriority(vtkIdType Edge);
+    // input mesh
+    vtkSurface* Input;
 
-	// input mesh
-	vtkSurface *Input;
-	
-	// the desired number of vertices
-	int NumberOfOutputVertices;
+    // the desired number of vertices
+    int NumberOfOutputVertices;
 
-	// priority queue used to compute geodesic voronoi regions
-	vtkPriorityQueue *EdgesQueue;
-	
-	vtkBitArray *NonContractibleEdges;
+    // priority queue used to compute geodesic voronoi regions
+    vtkPriorityQueue* EdgesQueue;
 
-	/// the constructor
-	vtkManifoldSimplification();
+    vtkBitArray* NonContractibleEdges;
 
-	/// the desctructor
-	~vtkManifoldSimplification();
-	
-	vtkIdList *FacesList;
-	
-	double *QuadricsArray;
-	double **Quadrics;
+    /// the constructor
+    vtkManifoldSimplification();
+
+    /// the desctructor
+    ~vtkManifoldSimplification();
+
+    vtkIdList* FacesList;
+
+    double* QuadricsArray;
+    double** Quadrics;
 };
-
 
 #endif
