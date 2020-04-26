@@ -75,9 +75,9 @@ public:
             I->Value[i] = 0;
         }
         I->Weight = 0;
-    };
+    }
 
-    double GetItemWeight(Item* I) { return I->Weight; };
+    double GetItemWeight(Item* I) { return I->Weight; }
 
     struct Cluster {
         // Value of the energy term for this cluster (cached to increase speed
@@ -192,8 +192,8 @@ public:
     {
         this->CustomWeights = 0;
         this->Gradation = 0;
-    };
-    ~vtkL21MetricForClustering(){};
+    }
+    ~vtkL21MetricForClustering(){}
 
     void BuildMetric(
         Item*& Items,

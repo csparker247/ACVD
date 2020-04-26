@@ -81,18 +81,18 @@ public:
         I->Value[1] = 0;
         I->Value[2] = 0;
         I->Weight = 0;
-    };
+    }
     double GetItemWeight(vtkIdType ItemId)
     {
         return this->Items[ItemId].Weight;
-    };
+    }
 
     struct Cluster {
         double SValue[3];
         double SWeight;
         double EnergyValue;
     };
-    int GetClusterRankDeficiency(Cluster* C) { return (0); };
+    int GetClusterRankDeficiency(Cluster* C) { return (0); }
     double GetClusterEnergy(Cluster* C) { return C->EnergyValue; }
     void ComputeClusterEnergy(Cluster* C)
     {
@@ -181,7 +181,7 @@ public:
         this->Gradation = 0;
         this->Object = vtkObject::New();
         this->Items = 0;
-    };
+    }
 
     ~vtkIsotropicMetricForClustering()
     {
@@ -190,7 +190,7 @@ public:
             this->CustomWeights->Delete();
         if (this->Items)
             delete[] this->Items;
-    };
+    }
 
     void BuildMetric(
         Cluster*& Clusters,

@@ -159,7 +159,7 @@ public:
     vtkTypeMacro(vtkSurface, vtkSurfaceBase);
 
     /// Create a similar type object.
-    vtkDataObject* MakeObject() { return vtkSurface::New(); };
+    vtkDataObject* MakeObject() { return vtkSurface::New(); }
 
     /// Quantizes the coordinates of the mesh to integers
     /// (dynamic range : q bits)
@@ -181,7 +181,7 @@ public:
     int IsSharpVertex(vtkIdType v)
     {
         return (this->SharpVertices->GetValue(v));
-    };
+    }
 
     /// Cancels the computation of the sharp vertices list
     void DeleteSharpVertices();
@@ -193,7 +193,7 @@ public:
         Tx = this->Tx;
         Ty = this->Ty;
         Tz = this->Tz;
-    };
+    }
 
     /// sets the scaling factors used for quantization
     void SetScalingFactors(double Factor, double Tx, double Ty, double Tz)
@@ -202,7 +202,7 @@ public:
         this->Tx = Tx;
         this->Ty = Ty;
         this->Tz = Tz;
-    };
+    }
 
     /// sets the scaling factors used for quantization
     void SetScalingFactors(vtkSurface* Mesh)
@@ -213,7 +213,7 @@ public:
         this->Tx = Tx;
         this->Ty = Ty;
         this->Tz = Tz;
-    };
+    }
 
     void UnQuantizeScalingFactors();
     void UnQuantizeCoordinates();

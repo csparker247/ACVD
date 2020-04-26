@@ -96,12 +96,12 @@ public:
 
         for (i = 0; i < 3; i++)
             I->TensorXCentroid[i] = 0;
-    };
+    }
 
     double GetItemWeight(vtkIdType ItemId)
     {
         return this->Items[ItemId].Weight;
-    };
+    }
 
     struct Cluster {
         double SValue[3];
@@ -119,7 +119,7 @@ public:
         double STensorXCentroid[3];
     };
 
-    int GetClusterRankDeficiency(Cluster* C) { return (0); };
+    int GetClusterRankDeficiency(Cluster* C) { return (0); }
 
     double GetClusterEnergy(Cluster* C) { return C->EnergyValue; }
     void ComputeClusterEnergy(Cluster* C)
@@ -254,7 +254,7 @@ public:
         this->PrincipalDirections = 0;
         this->Gradation = 0;
         this->Object = vtkObject::New();
-    };
+    }
     ~vtkAnisotropicMetricForClustering()
     {
         if (this->CustomWeights)
@@ -262,7 +262,7 @@ public:
         if (this->PrincipalDirections)
             this->PrincipalDirections->Delete();
         this->Object->Delete();
-    };
+    }
 
     void BuildMetric(
         Cluster*& Clusters,

@@ -48,7 +48,7 @@ public:
     static vtkMySimpleCriticalSection* New()
     {
         return new vtkMySimpleCriticalSection;
-    };
+    }
 
     // Description:
     // Unlock the vtkCriticalSection
@@ -61,11 +61,11 @@ public:
 #endif
 
         //// TODO : other architectures (Win32 etc...)
-    };
+    }
 
-    void Delete() { delete this; };
-    vtkMySimpleCriticalSection(){};
-    virtual ~vtkMySimpleCriticalSection(){};
+    void Delete() { delete this; }
+    vtkMySimpleCriticalSection(){}
+    virtual ~vtkMySimpleCriticalSection(){}
 };
 
 // Class derived from vtkUniformClustering
@@ -81,14 +81,14 @@ class vtkThreadedClustering : public vtkUniformClustering<Metric>
 public:
     /// Sets the number of desired threads for multithreading.
     /// by default, the number of threads is the number of CPUS
-    void SetNumberOfThreads(int N) { this->NumberOfThreads = N; };
+    void SetNumberOfThreads(int N) { this->NumberOfThreads = N; }
 
     /// returns the number of threads used for the clustering.
-    int GetNumberOfThreads() { return (this->NumberOfThreads); };
+    int GetNumberOfThreads() { return (this->NumberOfThreads); }
 
     /// sets the pooling ratio (the number of pool jobs will be equal to
     /// NumberOfThreads*PoolingRatio+1 default value : 5
-    void SetPoolingRatio(int Ratio) { this->PoolingRatio = Ratio; };
+    void SetPoolingRatio(int Ratio) { this->PoolingRatio = Ratio; }
 
     virtual vtkIntArray* ProcessClustering(vtkIdList* List = 0)
     {
@@ -104,7 +104,7 @@ public:
         else
             cout << "No locking collision detected" << endl;
         return (this->Clustering);
-    };
+    }
 
 protected:
     // the constructor
@@ -129,7 +129,7 @@ protected:
         int i;
         for (i = 0; i < EList->GetNumberOfIds(); i++)
             this->AddEdgeToProcess(EList->GetId(i), ProcessId);
-    };
+    }
 
     // virtual function. Might be implemented in derived classes for speed
     // issues
@@ -141,7 +141,7 @@ protected:
         int Thread)
     {
         return this->ConnexityConstraintProblem(Item, Edge, Cluster2, Cluster1);
-    };
+    }
 
     // allocates and initializes memory for the threaded clustering
     // (queues, timings)
@@ -163,7 +163,7 @@ protected:
     {
         this->ProcessesPushQueues[this->EdgesProcess[Edge]][ProcessId].push(
             Edge);
-    };
+    }
 
     /// The number of threads
     int NumberOfThreads;
@@ -851,7 +851,7 @@ void vtkThreadedClustering<Metric>::SwapQueues()
     std::queue<int>** Temp = this->ProcessesPopQueues;
     this->ProcessesPopQueues = this->ProcessesPushQueues;
     this->ProcessesPushQueues = Temp;
-};
+}
 
 template <class Metric>
 void vtkThreadedClustering<Metric>::Init()

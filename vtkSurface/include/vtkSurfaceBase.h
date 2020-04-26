@@ -74,7 +74,7 @@ public:
     vtkTypeMacro(vtkSurfaceBase, vtkPolyData);
 
     /// Create a similar type object.
-    vtkDataObject* MakeObject() { return vtkSurfaceBase::New(); };
+    vtkDataObject* MakeObject() { return vtkSurfaceBase::New(); }
 
     /// Embeds a vtkPolyData into a vtkSurfaceBase object.
     void CreateFromPolyData(vtkPolyData* input);
@@ -149,16 +149,16 @@ public:
     void DeleteVertex(vtkIdType v1);
 
     /// Sets On/Off the ability to clean vertices.  Default Value : 1
-    void SetCleanVertices(int C) { this->CleanVertices = C; };
+    void SetCleanVertices(int C) { this->CleanVertices = C; }
 
     /// returns the value of CleanVertices. Default Value : 1
-    int GetCleanVerticesState() { return this->CleanVertices; };
+    int GetCleanVerticesState() { return this->CleanVertices; }
 
     /// returns the value of CleanEdges. Default Value : 1
-    int GetCleanEdgesState() { return this->CleanEdges; };
+    int GetCleanEdgesState() { return this->CleanEdges; }
 
     /// Sets On/Off the ability to clean Edges. Default Value : 1
-    void SetCleanEdges(int C) { this->CleanEdges = C; };
+    void SetCleanEdges(int C) { this->CleanEdges = C; }
 
     /// Merge the two input vertices v1 and v2. This is a general general merge
     /// operator which can be used as edge collapse operator. (NOT FULLY TESTED)
@@ -169,7 +169,7 @@ public:
         vtkIdType Face, vtkIdType OldVertex, vtkIdType NewVertex);
 
     /// Returns the number of edges in the vtkSurfaceBase Object
-    int GetNumberOfEdges() { return this->NumberOfEdges; };
+    int GetNumberOfEdges() { return this->NumberOfEdges; }
 
     /// Returns v1 and v2 as the vertices bounding the edge
     void GetEdgeVertices(const vtkIdType& edge, vtkIdType& v1, vtkIdType& v2);
@@ -288,21 +288,21 @@ public:
     int IsVertexActive(vtkIdType Vertex)
     {
         return (this->ActiveVertices->GetValue(Vertex));
-    };
+    }
 
     /// returns 1 if Face is actually used to store a polygon (not deleted).
     /// Returns 0 otherwise
     int IsFaceActive(vtkIdType Face)
     {
         return (this->ActivePolygons->GetValue(Face));
-    };
+    }
 
     /// returns 1 if Edge is actually used to store an edge (not deleted).
     /// Returns 0 otherwise
     int IsEdgeActive(vtkIdType Edge)
     {
         return (this->ActiveEdges->GetValue(Edge));
-    };
+    }
 
     /// Checks the integrity of the structure. Returns true if the structure is
     /// OK
@@ -433,7 +433,8 @@ inline void vtkSurfaceBase::SetFace(
     vertices[1] = v2;
     vertices[2] = v3;
     this->ReplaceCell(f1, 3, vertices);
-};
+}
+
 // ** METHODE GetThirdPoint
 inline vtkIdType vtkSurfaceBase::GetThirdPoint(
     const vtkIdType& f1, const vtkIdType& v1, const vtkIdType& v2)

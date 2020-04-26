@@ -31,7 +31,6 @@ email                :
 #include <vtkCellData.h>
 #include <vtkMultiThreader.h>
 #include <vtkPriorityQueue.h>
-#include <vtkTimerLog.h>
 #include <vtkTriangle.h>
 
 #include "vtkCurvatureMeasure.h"

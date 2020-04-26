@@ -350,13 +350,13 @@ public:
         this->ActiveConstraintsFlag = 1;
         this->Object = vtkObject::New();
         this->QuadricsOptimizationLevel = 3;
-    };
+    }
     ~vtkQEMetricForClustering()
     {
         this->Object->Delete();
         if (this->CustomWeights)
             this->CustomWeights->Delete();
-    };
+    }
 
 private:
     int ActiveConstraintsFlag;

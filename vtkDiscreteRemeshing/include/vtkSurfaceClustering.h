@@ -61,7 +61,7 @@ public:
     void SetInput(vtkSurface* Input);
 
     /// Returns the Input mesh
-    vtkSurface* GetInput() { return (this->Input); };
+    vtkSurface* GetInput() { return (this->Input); }
 
     vtkIdType GetNumberOfEdges() { return this->Input->GetNumberOfEdges(); }
 
@@ -76,7 +76,7 @@ public:
             VList->InsertNextId(v1);
             VList->InsertNextId(v2);
         }
-    };
+    }
 
     vtkGetMacro(ClusteringType, int);
 
@@ -135,7 +135,7 @@ void vtkSurfaceClustering<Metric>::SetInput(vtkSurface* Input)
     this->Input = Input;
     if (Input)
         this->Input->Register(this);
-};
+}
 
 template <class Metric>
 vtkSurfaceClustering<Metric>::vtkSurfaceClustering()

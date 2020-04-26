@@ -111,12 +111,12 @@ public:
 
         for (i = 0; i < 9; i++)
             I->Quadric[i] = 0;
-    };
+    }
 
     double GetItemWeight(vtkIdType ItemId)
     {
         return this->Items[ItemId].Weight;
-    };
+    }
 
     struct Cluster {
         double SValue[3];
@@ -139,7 +139,7 @@ public:
         double SQuadric[9];
     };
 
-    int GetClusterRankDeficiency(Cluster* C) { return (0); };
+    int GetClusterRankDeficiency(Cluster* C) { return (0); }
 
     double GetClusterEnergy(Cluster* C) { return C->EnergyValue; }
     void ComputeClusterEnergy(Cluster* C)
@@ -287,7 +287,7 @@ public:
         this->Gradation = 0;
         this->Object = vtkObject::New();
         this->QuadricsOptimizationLevel = 3;
-    };
+    }
     ~vtkQuadricAnisotropicMetricForClustering()
     {
         if (this->CustomWeights)
@@ -295,7 +295,7 @@ public:
         if (this->PrincipalDirections)
             this->PrincipalDirections->Delete();
         this->Object->Delete();
-    };
+    }
 
     void BuildMetric(
         Cluster*& Clusters,

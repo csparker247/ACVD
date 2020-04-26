@@ -34,6 +34,8 @@
 #include <vtkDataArrayCollection.h>
 #include <vtkFloatArray.h>
 #include <vtkObjectFactory.h>
+#include <vtkTimerLog.h>
+
 #include "vtkSurface.h"
 
 class VTK_EXPORT vtkCurvatureMeasure : public vtkObject

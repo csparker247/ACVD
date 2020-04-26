@@ -73,7 +73,7 @@ public:
 
 protected:
     vtkIsotropicDiscreteRemeshing() {}
-    ~vtkIsotropicDiscreteRemeshing(){};
+    ~vtkIsotropicDiscreteRemeshing(){}
 };
 
 typedef vtkDiscreteRemeshing<vtkQEMetricForClustering> TempQERemeshing;
@@ -95,7 +95,7 @@ public:
 
 protected:
     vtkQIsotropicDiscreteRemeshing() {}
-    ~vtkQIsotropicDiscreteRemeshing(){};
+    ~vtkQIsotropicDiscreteRemeshing(){}
 };
 
 #endif

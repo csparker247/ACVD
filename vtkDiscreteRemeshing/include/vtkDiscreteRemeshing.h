@@ -51,7 +51,7 @@ class vtkDiscreteRemeshing : public vtkSurfaceClustering<Metric>
 {
 public:
     /// returns the coarsened model.
-    vtkSurface* GetOutput() { return this->Output; };
+    vtkSurface* GetOutput() { return this->Output; }
 
     // process the remeshing
     virtual void Remesh();
@@ -59,10 +59,10 @@ public:
     /// defines the Subsampling threshold. If the subsampling ratio is below
     /// this threshold, the mesh will be subdivided accordingly. Default value:
     /// 10
-    void SetSubsamplingThreshold(int T) { this->SubsamplingThreshold = T; };
+    void SetSubsamplingThreshold(int T) { this->SubsamplingThreshold = T; }
 
     // Sets On/Off the Edges optimization scheme (still experimental)
-    void SetEdgesOptimization(int S) { this->EdgeOptimizationFlag = S; };
+    void SetEdgesOptimization(int S) { this->EdgeOptimizationFlag = S; }
 
     // Sets On/Off the fix for meshes with boundaries. Default value: 1 (On)
     void SetBoundaryFixing(int B) { this->BoundaryFixingFlag = B; }
