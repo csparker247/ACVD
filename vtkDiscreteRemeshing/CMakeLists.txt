@@ -34,7 +34,7 @@ target_include_directories(vtkDiscreteRemeshing
 )
 target_link_libraries(vtkDiscreteRemeshing
     PUBLIC
-        vtkSurface
+        ACVD::vtkSurface
     PRIVATE
         vtkCommonCore
 )
