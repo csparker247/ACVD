@@ -5,7 +5,7 @@ add_library(vtkVolumeProcessing
     src/vtkImageDataCleanLabels.cxx
     src/vtkOOCMetaImageReader.cxx
 )
-
+add_library("ACVD::vtkVolumeProcessing" ALIAS vtkVolumeProcessing)
 target_include_directories(vtkVolumeProcessing
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
