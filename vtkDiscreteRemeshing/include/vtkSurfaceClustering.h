@@ -55,7 +55,6 @@ class vtkSurfaceClustering : public vtkUniformClustering<Metric>
 #endif
 #endif
 {
-
 public:
     /// Sets the Input mesh
     void SetInput(vtkSurface* Input);

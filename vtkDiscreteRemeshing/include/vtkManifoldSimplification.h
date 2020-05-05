@@ -24,15 +24,15 @@ public:
     // Define the input mesh
     vtkSetObjectMacro(Input, vtkSurface)
 
-        // Simplify the input mesh
-        void Simplify();
+    // Simplify the input mesh
+    void Simplify();
 
     // Set the number of desired vertices
     vtkSetMacro(NumberOfOutputVertices, int)
 
-        protected :
+protected:
 
-        void AllocateMemory();
+    void AllocateMemory();
     void ReleaseMemory();
     void UpdateEdgePriority(vtkIdType Edge);
 

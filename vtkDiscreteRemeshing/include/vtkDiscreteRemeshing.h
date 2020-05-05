@@ -47,7 +47,6 @@
 
 template <class Metric>
 class vtkDiscreteRemeshing : public vtkSurfaceClustering<Metric>
-
 {
 public:
     /// returns the coarsened model.
@@ -68,14 +67,12 @@ public:
     void SetBoundaryFixing(int B) { this->BoundaryFixingFlag = B; }
 
     vtkSetMacro(ForceManifold, bool)
+    vtkSetMacro(MaxCustomDensity, double)
+    vtkSetMacro(MinCustomDensity, double)
+    vtkSetMacro(CustomDensityMultiplicationFactor, double)
 
-        vtkSetMacro(MaxCustomDensity, double)
-            vtkSetMacro(MinCustomDensity, double)
-                vtkSetMacro(CustomDensityMultiplicationFactor, double)
-
-                    protected :
-
-        vtkDiscreteRemeshing();
+protected:
+    vtkDiscreteRemeshing();
     ~vtkDiscreteRemeshing();
 
     /// In this method, we compute the curvature indicator and adapt it to the

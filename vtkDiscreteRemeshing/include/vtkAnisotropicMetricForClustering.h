@@ -148,6 +148,7 @@ public:
 
         C->EnergyValue -= 2.0 * (x * T[0] + y * T[1] + z * T[2]);
     }
+
     double ComputeDistanceBetweenItemAndCluster(Item* I, Cluster* C)
     {
         int i;
