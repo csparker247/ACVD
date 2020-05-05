@@ -12,28 +12,27 @@ Auteur:   Sebastien Valette
 
 #include <vtkMetaImageReader.h>
 #include <vtkMetaImageWriter.h>
-#include "vtkImageDataCleanLabels.h"
 #include <vtkSimpleImageFilterExample.h>
+#include "vtkImageDataCleanLabels.h"
 
-int main( int argc, char *argv[] )
+int main(int argc, char* argv[])
 {
-	if (argc<2)
-	{
-		cout<<"Usage : VolumeCleanLabels file.mhd"<<endl;
-		exit(1);
-	}
+    if (argc < 2) {
+        cout << "Usage : VolumeCleanLabels file.mhd" << endl;
+        exit(1);
+    }
 
-	// Load Volume
-	cout <<"load : "<<argv[1]<<endl;
+    // Load Volume
+    cout << "load : " << argv[1] << endl;
 
-	vtkMetaImageReader *Reader=vtkMetaImageReader::New();
-	Reader->SetFileName(argv[1]);
-	Reader->Update();
-	vtkImageDataCleanLabels *Cleaner=vtkImageDataCleanLabels::New();
-	Cleaner->SetInputConnection(Reader->GetOutputPort());
-	Cleaner->Update();
-	vtkMetaImageWriter *Writer=vtkMetaImageWriter::New();
-	Writer->SetInputConnection(Cleaner->GetOutputPort());
-	Writer->SetFileName("output.mhd");
-	Writer->Write();
+    vtkMetaImageReader* Reader = vtkMetaImageReader::New();
+    Reader->SetFileName(argv[1]);
+    Reader->Update();
+    vtkImageDataCleanLabels* Cleaner = vtkImageDataCleanLabels::New();
+    Cleaner->SetInputConnection(Reader->GetOutputPort());
+    Cleaner->Update();
+    vtkMetaImageWriter* Writer = vtkMetaImageWriter::New();
+    Writer->SetInputConnection(Cleaner->GetOutputPort());
+    Writer->SetFileName("output.mhd");
+    Writer->Write();
 }

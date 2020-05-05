@@ -15,6 +15,7 @@ add_library(vtkSurface
   src/vtkCurvatureMeasure.cxx
   src/vtkMyMinimalStandardRandomSequence.cxx
 )
+add_library("ACVD::vtkSurface" ALIAS vtkSurface)
 target_include_directories(vtkSurface
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
