@@ -220,7 +220,7 @@ int vtkDiscreteRemeshing<Metric>::DetectNonManifoldOutputVertices(double Factor)
     for (int i = 0; i != ClustersWithIssues->GetNumberOfIds(); i++) {
         vtkIdType Cluster = ClustersWithIssues->GetId(i);
         vtkIdList* Items = ClusterItems[Cluster];
-        if (Items == 0)
+        if (Items == 0) {
             cout << "Warning : cluster " << Cluster << " seems empty!" << endl;
         }
         vtkIdType FirstSpareCluster =
