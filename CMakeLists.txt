@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(ACVD VERSION 1.1.2)
+project(ACVD VERSION 1.1.3)
 
 set(ACVD_LIB_SOVERSION ${ACVD_VERSION_MAJOR}.${ACVD_VERSION_MINOR})
 
