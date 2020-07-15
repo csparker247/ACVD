@@ -433,24 +433,22 @@ void vtkDiscreteRemeshing<Metric>::SamplingPreProcessing()
         vtkPolyData* PrincipalDirectionsPolyData = nullptr;
         vtkDataArrayCollection* CurvatureCollection = nullptr;
 
-        if (false) {
-            auto Curvature = vtkCurvatureMeasure::New();
-            if (this->OriginalInput)
-                Curvature->SetInputData(this->OriginalInput);
-            else
-                Curvature->SetInputData(this->Input);
+        auto Curvature = vtkCurvatureMeasure::New();
+        if (this->OriginalInput)
+            Curvature->SetInputData(this->OriginalInput);
+        else
+            Curvature->SetInputData(this->Input);
 
-            Curvature->SetComputationMethod(1);
-            Curvature->SetElementsType(this->ClusteringType);
-            Curvature->SetComputePrincipalDirections(
-                this->MetricContext.IsPrincipalDirectionsNeeded());
+        Curvature->SetComputationMethod(1);
+        Curvature->SetElementsType(this->ClusteringType);
+        Curvature->SetComputePrincipalDirections(
+            this->MetricContext.IsPrincipalDirectionsNeeded());
 
-            CurvatureCollection = Curvature->GetCurvatureIndicator();
-            CurvatureCollection->Register(this);
+        CurvatureCollection = Curvature->GetCurvatureIndicator();
+        CurvatureCollection->Register(this);
 
-            CellsIndicators = (vtkDoubleArray*)CurvatureCollection->GetItem(0);
-            Curvature->Delete();
-        }
+        CellsIndicators = (vtkDoubleArray*)CurvatureCollection->GetItem(0);
+        Curvature->Delete();
 
         // now we have to interpolate the curvature measure when the input mesh
         // was subdivided
@@ -492,7 +490,6 @@ void vtkDiscreteRemeshing<Metric>::SamplingPreProcessing()
             }
             CurvatureCollection->ReplaceItem(0, CellsIndicators2);
             CellsIndicators2->Delete();
-            //			CellsIndicators->Delete();
             CellsIndicators = CellsIndicators2;
 
             cout << ".... Done" << endl;
@@ -569,9 +566,6 @@ void vtkDiscreteRemeshing<Metric>::CheckSubsamplingRatio()
 template <class Metric>
 void vtkDiscreteRemeshing<Metric>::Remesh()
 {
-    int i;
-    int Compute = 1;
-
     this->CheckSubsamplingRatio();
     this->SamplingPreProcessing();
 
@@ -799,49 +793,6 @@ void vtkDiscreteRemeshing<Metric>::AdjustRemeshedGeometry()
 template <class Metric>
 void vtkDiscreteRemeshing<Metric>::OptimizeOutputEdges()
 {
-    /*
-     * int  i,j;
-     * double P1[3],P2[3],P3[3],P4[3],P12[3],P34[3];
-     * vtkIdType v1,v2,v3,v4,f1,f2;
-     *
-     * double Quadric[10];
-     * double d1,d2;
-     *
-     * for  (i=0;i<this->Output->GetNumberOfEdges();i++)
-     * {
-     * Output->GetEdgeFaces(i,f1,f2);
-     * if ((f2>=0)&&(this->Input->IsEdgeManifold(i)==1))
-     * {
-     * Output->GetEdgeVertices(i,v1,v2);
-     * v3=Output->GetThirdPoint(f1,v1,v2);
-     * v4=Output->GetThirdPoint(f2,v1,v2);
-     * if (Output->IsEdge(v3,v4)==-1)
-     * {
-     * Output->GetPoints()->GetPoint(v1,P1);
-     * Output->GetPoints()->GetPoint(v2,P2);
-     * Output->GetPoints()->GetPoint(v3,P3);
-     * Output->GetPoints()->GetPoint(v4,P4);
-     *
-     * for  (j=0;j<10;j++)
-     * Quadric[j]=
-     * Quadrics[v1][j]
-     * +Quadrics[v2][j];
-     * //+Quadrics[v3][j]
-     * //+Quadrics[v4][j];
-     *
-     * for  (j=0;j<3;j++)
-     * {
-     * P12[j]=0.5*(P1[j]+P2[j]);
-     * P34[j]=0.5*(P3[j]+P4[j]);
-     * }
-     * d1=this->ComputeQuadraticDistance(P12,Quadric);
-     * d2=this->ComputeQuadraticDistance(P34,Quadric);
-     * if (d1*0.6>d2)
-     * Output->FlipEdge(i);
-     * }
-     * }
-     * }
-     */
 }
 
 template <class Metric>

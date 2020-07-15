@@ -1,3 +1,4 @@
+#pragma once
 /*=========================================================================
 
 Program:   L2,1 Metric for Clustering
@@ -29,9 +30,6 @@ Auteur:    Sebastien VALETTE
 *  The fact that you are presently reading this means that you have had
 *  knowledge of the CeCILL-B license and that you accept its terms.
 * ------------------------------------------------------------------------ */
-
-#ifndef _VTKL21METRICFORCLUSTERING_H_
-#define _VTKL21METRICFORCLUSTERING_H_
 
 #include <vtkIdList.h>
 #include <vtkMath.h>
@@ -323,5 +321,3 @@ private:
     double Factor;
     double Gradation;
 };
-
-#endif
