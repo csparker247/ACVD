@@ -33,8 +33,8 @@
 * ------------------------------------------------------------------------ */
 
 #include <algorithm>
-#include <cstdlib>
 #include <queue>
+#include <random>
 
 #include <vtkBitArray.h>
 #include <vtkCellData.h>
@@ -1193,7 +1193,6 @@ template <class Metric, class EdgeType>
 void vtkUniformClustering<Metric, EdgeType>::ComputeInitialRandomSampling(
     vtkIdList* List, vtkIntArray* Sampling, int NumberOfRegions)
 {
-
     for (int i = 0; i < this->GetNumberOfItems(); i++)
         Sampling->SetValue(i, this->NumberOfClusters);
 
@@ -1205,16 +1204,10 @@ void vtkUniformClustering<Metric, EdgeType>::ComputeInitialRandomSampling(
     std::queue<int> IQueue;
 
     // shuffle the Ids ordering
-    struct LegacyRandom {
-        using result_type = int;
-        int operator()() { return std::rand(); }
-        constexpr static int max() { return RAND_MAX; }
-        constexpr static int min() { return 0; }
-    };
-    LegacyRandom randGen;
+    std::mt19937 g;
     for (int i = 0; i < NumberOfRemainingItems; i++)
         Items[i] = i;
-    std::shuffle(Items, Items + NumberOfRemainingItems, randGen);
+    std::shuffle(Items, Items + NumberOfRemainingItems, g);
 
     // compute total weight
     double SWeights = 0;
@@ -1280,7 +1273,7 @@ void vtkUniformClustering<Metric, EdgeType>::ComputeInitialRandomSampling(
         Items[i] = i;
     }
 
-    std::shuffle(Items, Items + NumberOfItems, randGen);
+    std::shuffle(Items, Items + NumberOfItems, g);
     FirstItem = 0;
     while (NumberOfRemainingRegions > 0) {
         Found = false;
