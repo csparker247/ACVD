@@ -1,3 +1,5 @@
+#pragma once
+
 /***************************************************************************
 vtkIsotropicDiscreteRemeshing.h  -  description
 -------------------
@@ -27,9 +29,6 @@ email                :
 *  The fact that you are presently reading this means that you have had
 *  knowledge of the CeCILL-B license and that you accept its terms.
 * ------------------------------------------------------------------------ */
-
-#ifndef _VTKISOTROPICDISCRETEREMESHING_H_
-#define _VTKISOTROPICDISCRETEREMESHING_H_
 
 #include <vtkObjectFactory.h>
 
@@ -97,5 +96,3 @@ protected:
     vtkQIsotropicDiscreteRemeshing() {}
     ~vtkQIsotropicDiscreteRemeshing() {}
 };
-
-#endif

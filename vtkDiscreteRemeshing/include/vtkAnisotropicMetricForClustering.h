@@ -1,3 +1,5 @@
+#pragma once
+
 /*=========================================================================
 
   Program:   vtkAnisotropicMetricForClustering.h
@@ -29,9 +31,6 @@
 *  knowledge of the CeCILL-B license and that you accept its terms.
 * ------------------------------------------------------------------------ */
 
-#ifndef _VTKANISOTROPICMETRICFORCLUSTERING_H_
-#define _VTKANISOTROPICMETRICFORCLUSTERING_H_
-
 #include <vtkMath.h>
 #include <vtkTriangle.h>
 
@@ -53,7 +52,7 @@ public:
     void SetConstrainedClustering(int C) {}
 
     int IsCurvatureIndicatorNeeded() { return 1; }
-    int IsPrincipalDirectionsNeeded() { return (1); }
+    int IsPrincipalDirectionsNeeded() { return 1; }
 
     void SetCurvatureInfo(vtkDataArrayCollection* Info)
     {
@@ -424,5 +423,3 @@ private:
     // The array storing the items
     Item* Items;
 };
-
-#endif

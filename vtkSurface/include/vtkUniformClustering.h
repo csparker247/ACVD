@@ -1,3 +1,5 @@
+#pragma once
+
 /*=========================================================================
 
   Program:   Uniform Clustering (abstract class)
@@ -29,9 +31,6 @@
 *  The fact that you are presently reading this means that you have had
 *  knowledge of the CeCILL-B license and that you accept its terms.
 * ------------------------------------------------------------------------ */
-
-#ifndef _VTKUNIFORMCLUSTERING_H_
-#define _VTKUNIFORMCLUSTERING_H_
 
 #include <algorithm>
 #include <queue>
@@ -1205,10 +1204,12 @@ void vtkUniformClustering<Metric, EdgeType>::ComputeInitialRandomSampling(
     std::queue<int> IQueue;
 
     // shuffle the Ids ordering
-    std::random_device rd;
-    std::mt19937 g(rd());
-    for (int i = 0; i < NumberOfRemainingItems; i++)
+    // We want these shuffled, but predictably, so that repeated run produce
+    // the same output. Don't seed the generator.
+    std::mt19937 g;
+    for (int i = 0; i < NumberOfRemainingItems; i++) {
         Items[i] = i;
+    }
     std::shuffle(Items, Items + NumberOfRemainingItems, g);
 
     // compute total weight
@@ -1422,4 +1423,3 @@ vtkUniformClustering<Metric, EdgeType>::~vtkUniformClustering()
 
     this->EdgeList->Delete();
 }
-#endif

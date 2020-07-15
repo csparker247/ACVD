@@ -1,3 +1,5 @@
+#pragma once
+
 /***************************************************************************
 vtkIsotropicDiscreteRemeshing.h  -  description
 -------------------
@@ -28,9 +30,6 @@ email                :
 *  knowledge of the CeCILL-B license and that you accept its terms.
 * ------------------------------------------------------------------------ */
 
-#ifndef _VTKANISOTROPICDISCRETEREMESHING_H_
-#define _VTKANISOTROPICDISCRETEREMESHING_H_
-
 #include <vtkObjectFactory.h>
 
 #include "vtkDiscreteRemeshing.h"
@@ -55,7 +54,7 @@ public:
     static vtkAnisotropicDiscreteRemeshing* New()
     {
         // First try to	create the object from the vtkObjectFactory
-        vtkObject* ret =
+        auto* ret =
             vtkObjectFactory::CreateInstance("vtkAnisotropicDiscreteRemeshing");
         if (ret) {
             return (vtkAnisotropicDiscreteRemeshing*)ret;
@@ -68,5 +67,3 @@ protected:
     vtkAnisotropicDiscreteRemeshing() {}
     ~vtkAnisotropicDiscreteRemeshing() {}
 };
-
-#endif

@@ -1,3 +1,4 @@
+#pragma once
 /*=========================================================================
 
 Program:   Isotropic Metric for Clustering
@@ -30,9 +31,6 @@ Auteur:    Sebastien VALETTE
 *  knowledge of the CeCILL-B license and that you accept its terms.
 * ------------------------------------------------------------------------ */
 
-#ifndef _VTKISOTROPICMETRICFORCLUSTERING_H_
-#define _VTKISOTROPICMETRICFORCLUSTERING_H_
-
 #include <vtkDataArrayCollection.h>
 #include <vtkTriangle.h>
 #include "vtkSurface.h"
@@ -52,12 +50,14 @@ public:
 
     int IsCurvatureIndicatorNeeded()
     {
-        if (this->Gradation > 0)
+        if (this->Gradation > 0) {
             return 1;
-        else
-            return (0);
+        } else {
+            return 0;
+        }
     }
-    int IsPrincipalDirectionsNeeded() { return (0); }
+
+    int IsPrincipalDirectionsNeeded() { return 0; }
 
     void SetCurvatureInfo(vtkDataArrayCollection* Info)
     {
@@ -66,6 +66,7 @@ public:
         this->CustomWeights = (vtkDoubleArray*)Info->GetItem(0);
         this->CustomWeights->Register(this->Object);
     }
+
     void SetGradation(double Gradation) { this->Gradation = Gradation; }
 
     double GetGradation() { return this->Gradation; }
@@ -92,7 +93,7 @@ public:
         double SWeight;
         double EnergyValue;
     };
-    int GetClusterRankDeficiency(Cluster* C) { return (0); }
+    int GetClusterRankDeficiency(Cluster* C) { return 0; }
     double GetClusterEnergy(Cluster* C) { return C->EnergyValue; }
     void ComputeClusterEnergy(Cluster* C)
     {
@@ -103,7 +104,7 @@ public:
     }
     double ComputeDistanceBetweenItemAndCluster(Item* I, Cluster* C)
     {
-        return (0);
+        return 0;
     }
 
     double ComputeDistanceBetweenItemAndPoint(Item* I, double* P1)
@@ -201,8 +202,9 @@ public:
         vtkIdType i;
         // Build the clusters
         Clusters = new Cluster[NumberOfClusters];
-        for (i = 0; i < NumberOfClusters; i++)
+        for (i = 0; i < NumberOfClusters; i++) {
             this->ResetCluster(Clusters + i);
+        }
 
         // Build the items
         if (ClusteringType == 0) {
@@ -283,5 +285,3 @@ private:
     // The array storing items
     Item* Items;
 };
-
-#endif

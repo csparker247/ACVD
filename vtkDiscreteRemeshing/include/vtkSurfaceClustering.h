@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
                           vtkSurfaceClustering.h  -  description
                              -------------------
@@ -27,8 +28,6 @@
 *  The fact that you are presently reading this means that you have had
 *  knowledge of the CeCILL-B license and that you accept its terms.
 * ------------------------------------------------------------------------ */
-#ifndef _VTKSURFACECLUSTERING_H_
-#define _VTKSURFACECLUSTERING_H_
 
 #include <vtkTriangleFilter.h>
 
@@ -148,4 +147,3 @@ vtkSurfaceClustering<Metric>::~vtkSurfaceClustering()
     if (this->Input)
         this->Input->Delete();
 }
-#endif
