@@ -1,3 +1,5 @@
+#pragma once
+
 /***************************************************************************
                           vtkDiscreteRemeshing.h  -  description
                              -------------------
@@ -27,9 +29,6 @@
 *  The fact that you are presently reading this means that you have had
 *  knowledge of the CeCILL-B license and that you accept its terms.
 * ------------------------------------------------------------------------ */
-
-#ifndef _VTKDISCRETEREMESHING_H_
-#define _VTKDISCRETEREMESHING_H_
 
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
@@ -170,15 +169,17 @@ int vtkDiscreteRemeshing<Metric>::DetectNonManifoldOutputVertices(double Factor)
         if ((Cluster < 0) || (Cluster >= this->NumberOfClusters))
             NumberOfUncorrectlyAssociatedItems++;
         else {
-            if (ClusterItems[Cluster] == 0)
+            if (ClusterItems[Cluster] == 0) {
                 ClusterItems[Cluster] = vtkIdList::New();
+            }
             ClusterItems[Cluster]->InsertNextId(i);
         }
     }
 
-    if (NumberOfUncorrectlyAssociatedItems != 0)
+    if (NumberOfUncorrectlyAssociatedItems != 0) {
         cout << NumberOfUncorrectlyAssociatedItems
              << " uncorrectly associated items" << endl;
+    }
 
     int NumberOfTopologyIssues = 0;
     vtkIdList* ClustersWithIssues = vtkIdList::New();
@@ -203,13 +204,6 @@ int vtkDiscreteRemeshing<Metric>::DetectNonManifoldOutputVertices(double Factor)
             if (problem) {
                 NumberOfTopologyIssues++;
                 ClustersWithIssues->InsertNextId(Cluster);
-                /*			vtkIdList *CItems=ClusterItems[Cluster];
-                            int Size=0;
-                            if (CItems!=0)
-                                Size=CItems->GetNumberOfIds();
-
-                            cout<<"Vertex "<<Cluster<<" is non manifold. Cluster
-                   size : "<<Size<<endl;*/
 
                 // unfreeze this cluster and its neighbours
                 this->IsClusterFreezed->SetValue(Cluster, 0);
@@ -228,19 +222,15 @@ int vtkDiscreteRemeshing<Metric>::DetectNonManifoldOutputVertices(double Factor)
         vtkIdList* Items = ClusterItems[Cluster];
         if (Items == 0)
             cout << "Warning : cluster " << Cluster << " seems empty!" << endl;
-        else {
-            //			for (vtkIdType j=0;j!=Items->GetNumberOfIds();j++)
-            //				this->MetricContext.MultiplyItemWeight(Items->GetId(j),Factor);
         }
         vtkIdType FirstSpareCluster =
             this->NumberOfClusters - this->NumberOfSpareClusters;
         if (this->NumberOfSpareClusters == 0) {
-            cout << endl << "Not enough spare clusters! allocate more!" << endl;
-            exit(1);
+            throw std::runtime_error(
+                "Not enough spare clusters! allocate more!");
         }
         this->IsClusterFreezed->SetValue(FirstSpareCluster, 0);
-        //		cout<<"Adding cluster "<<FirstSpareCluster<<" near cluster
-        //"<<Cluster<<endl;
+
         if (Items->GetNumberOfIds() > 1) {
             vtkIdType ItemToMove = Items->GetId(0);
             this->Clustering->SetValue(ItemToMove, FirstSpareCluster);
@@ -251,18 +241,9 @@ int vtkDiscreteRemeshing<Metric>::DetectNonManifoldOutputVertices(double Factor)
         } else {
             // the cluster has only one item. Pick a neighbour item
             vtkIdType Item = Items->GetId(0);
-            //			cout<<"Cluster "<<Cluster<<" contains only vertex
-            //"<<Item<<" of valence "
-            //			<<this->Input->GetValence(Item)<<endl;
+
             this->Input->GetVertexNeighbourFaces(Item, FList);
-            /*			cout<<"Neighbour faces: "<<endl;
-                        for (int j=0;j!=FList->GetNumberOfIds();j++)
-                        {
-                            vtkIdType v1,v2,v3;
-                            this->Input->GetFaceVertices(FList->GetId(j),v1,v2,v3);
-                            cout<<FList->GetId(j)<<" : vertices "<<v1<<"
-               "<<v2<<" "<<v3<<endl;
-                        }*/
+
             this->GetItemNeighbours(Item, IList);
             bool found = false;
             for (int j = 0; j < IList->GetNumberOfIds(); j++) {
@@ -272,8 +253,6 @@ int vtkDiscreteRemeshing<Metric>::DetectNonManifoldOutputVertices(double Factor)
                 if (ClusterItems[NeighbourCluster]->GetNumberOfIds() > 1) {
                     this->Clustering->SetValue(Neighbour, FirstSpareCluster);
                     ClusterItems[NeighbourCluster]->DeleteId(Neighbour);
-                    //					cout<<"Took 1 item from cluster
-                    //"<<NeighbourCluster<<endl;
                     ClusterItems[FirstSpareCluster] = vtkIdList::New();
                     ClusterItems[FirstSpareCluster]->InsertNextId(Neighbour);
                     found = true;
@@ -282,9 +261,6 @@ int vtkDiscreteRemeshing<Metric>::DetectNonManifoldOutputVertices(double Factor)
                 }
             }
             if (!found) {
-                //				cout<<"Could not find a place to add cluster
-                //"<<FirstSpareCluster
-                //				<<" near cluster "<<Cluster<<endl;
                 for (int j = 0; j < IList->GetNumberOfIds(); j++) {
                     vtkIdType Neighbour = IList->GetId(j);
                     vtkIdType NeighbourCluster =
@@ -296,11 +272,6 @@ int vtkDiscreteRemeshing<Metric>::DetectNonManifoldOutputVertices(double Factor)
                         ClusterItems[FirstSpareCluster] = vtkIdList::New();
                         ClusterItems[FirstSpareCluster]->InsertNextId(
                             Neighbour);
-                    } else {
-                        //						cout<<"Neighbour :
-                        //"<<NeighbourCluster<<" has "
-                        //							<<ClusterItems[NeighbourCluster]->GetNumberOfIds()<<"
-                        // items"<<endl;
                     }
                 }
             }
@@ -321,42 +292,8 @@ int vtkDiscreteRemeshing<Metric>::DetectNonManifoldOutputVertices(double Factor)
 template <class Metric>
 void vtkDiscreteRemeshing<Metric>::FixClusteringToVoronoi()
 {
-    /*
-        int i,j;
-        int Cluster,NearestCluster,Neighbour;
-        double Distance,DistanceMin,ItemCoordinates[3],ClusterCoordinates[3];
-        vtkIdList *NeighbourClusters=vtkIdList::New();
-
-        for (i=0;i<this->GetNumberOfItems();i++)
-        {
-            Cluster=this->Clustering->GetValue(i);
-            this->GetItemCoordinates(i,ItemCoordinates);
-            this->GetClusterCentroid(Cluster,ClusterCoordinates);
-            NearestCluster=Cluster;
-            DistanceMin=vtkMath::Distance2BetweenPoints(ClusterCoordinates,ItemCoordinates);
-            this->GetOutput()->GetVertexNeighbours(Cluster,NeighbourClusters);
-            if (NeighbourClusters->GetNumberOfIds()>0)
-            {
-                cout<<NeighbourClusters->GetNumberOfIds()<<" ";
-                for (j=0;j<NeighbourClusters->GetNumberOfIds();j++)
-                {
-                    Neighbour=NeighbourClusters->GetId(j);
-                    this->GetClusterCentroid(Neighbour,ClusterBarycenter);
-                    Distance=vtkMath::Distance2BetweenPoints(ClusterBarycenter,TriangleBarycenter);
-                    if (Distance<DistanceMin)
-                    {
-                        DistanceMin=Distance;
-                        NearestCluster=Neighbour;
-                    }
-                }
-                this->Clustering->SetValue(i,NearestCluster);
-            }
-        }
-        NeighbourClusters->Delete();
-        this->ReComputeStatistics();
-        this->Clustering->Modified();
-        */
 }
+
 template <class Metric>
 void vtkDiscreteRemeshing<Metric>::FixMeshBoundaries()
 {
@@ -493,26 +430,27 @@ void vtkDiscreteRemeshing<Metric>::SamplingPreProcessing()
     CustomIndicatorColors->SetNumberOfValues(this->GetNumberOfItems());
 
     if (this->MetricContext.IsCurvatureIndicatorNeeded() == 1) {
-        vtkPolyData* PrincipalDirectionsPolyData = 0;
-        vtkDataArrayCollection* CurvatureCollection = 0;
+        vtkPolyData* PrincipalDirectionsPolyData = nullptr;
+        vtkDataArrayCollection* CurvatureCollection = nullptr;
 
-        auto Curvature = vtkCurvatureMeasure::New();
-        if (this->OriginalInput)
-            Curvature->SetInputData(this->OriginalInput);
-        else
-            Curvature->SetInputData(this->Input);
+        if (false) {
+            auto Curvature = vtkCurvatureMeasure::New();
+            if (this->OriginalInput)
+                Curvature->SetInputData(this->OriginalInput);
+            else
+                Curvature->SetInputData(this->Input);
 
-        Curvature->SetComputationMethod(1);
-        Curvature->SetElementsType(this->ClusteringType);
-        Curvature->SetComputePrincipalDirections(
-            this->MetricContext.IsPrincipalDirectionsNeeded());
+            Curvature->SetComputationMethod(1);
+            Curvature->SetElementsType(this->ClusteringType);
+            Curvature->SetComputePrincipalDirections(
+                this->MetricContext.IsPrincipalDirectionsNeeded());
 
-        CurvatureCollection = Curvature->GetCurvatureIndicator();
-        CurvatureCollection->Register(this);
+            CurvatureCollection = Curvature->GetCurvatureIndicator();
+            CurvatureCollection->Register(this);
 
-        CellsIndicators = (vtkDoubleArray*)CurvatureCollection->GetItem(0);
-
-        Curvature->Delete();
+            CellsIndicators = (vtkDoubleArray*)CurvatureCollection->GetItem(0);
+            Curvature->Delete();
+        }
 
         // now we have to interpolate the curvature measure when the input mesh
         // was subdivided
@@ -938,4 +876,3 @@ vtkDiscreteRemeshing<Metric>::~vtkDiscreteRemeshing()
     if (this->VerticesParent2)
         this->VerticesParent2->Delete();
 }
-#endif

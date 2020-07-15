@@ -1,3 +1,5 @@
+#pragma once
+
 /***************************************************************************
                           vtkClusteringExampleFile.h  -  description
                              -------------------
@@ -26,8 +28,6 @@
 *  The fact that you are presently reading this means that you have had
 *  knowledge of the CeCILL-B license and that you accept its terms.
 * ------------------------------------------------------------------------ */
-#ifndef _VTKCLUSTERINGEXAMPLEFILE_H_
-#define _VTKCLUSTERINGEXAMPLEFILE_H_
 
 #include <vtkObjectFactory.h>
 #include "vtkUniformClustering.h"
@@ -136,5 +136,3 @@ public:
     vtkMetricExample() {}
     ~vtkMetricExample() {}
 };
-
-#endif
