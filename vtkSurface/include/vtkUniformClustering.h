@@ -1204,9 +1204,12 @@ void vtkUniformClustering<Metric, EdgeType>::ComputeInitialRandomSampling(
     std::queue<int> IQueue;
 
     // shuffle the Ids ordering
+    // We want these shuffled, but predictably, so that repeated run produce
+    // the same output. Don't seed the generator.
     std::mt19937 g;
-    for (int i = 0; i < NumberOfRemainingItems; i++)
+    for (int i = 0; i < NumberOfRemainingItems; i++) {
         Items[i] = i;
+    }
     std::shuffle(Items, Items + NumberOfRemainingItems, g);
 
     // compute total weight
